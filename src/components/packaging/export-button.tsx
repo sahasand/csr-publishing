@@ -145,7 +145,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-4">
+          <div className="py-4 px-1">
             {/* List issues */}
             {readinessData && (
               <ul className="text-sm text-muted-foreground space-y-2">
@@ -188,7 +188,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
             )}
 
             {/* Force export checkbox */}
-            <div className="mt-6 pt-4 border-t border-border">
+            <div className="mt-6 pt-4 border-t border-border px-1">
               <label className="flex items-start gap-3 cursor-pointer">
                 <Checkbox
                   checked={forceExport}
