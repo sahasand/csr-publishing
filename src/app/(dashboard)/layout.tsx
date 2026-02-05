@@ -11,9 +11,12 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="w-64 border-r border-sidebar-foreground/10 bg-sidebar-bg text-sidebar-foreground">
         <div className="flex items-center gap-3 p-6 border-b border-sidebar-foreground/10">
-          <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-accent shadow-glow-accent" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent shadow-glow-accent">
+            <FileText className="h-5 w-5 text-white" />
+          </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight">CSR Publishing</h1>
+            <p className="text-xs text-sidebar-foreground/50">by TraceScribe</p>
           </div>
         </div>
         <nav className="px-4 space-y-1">

@@ -50,6 +50,16 @@ export default function DashboardPage() {
     },
   });
 
+  // Count documents pending review across all studies
+  const { data: pendingReviewCount = 0 } = useQuery<number>({
+    queryKey: ['pending-review-count'],
+    queryFn: async () => {
+      const res = await fetch('/api/documents/stats');
+      const json = await res.json();
+      return json.data?.pendingReviewCount ?? 0;
+    },
+  });
+
   const isLoading = studiesLoading || templatesLoading;
 
   const activeStudies = studies.filter(s => s.status === 'ACTIVE');
@@ -150,7 +160,7 @@ export default function DashboardPage() {
             <AlertCircle className="h-4 w-4 text-warning" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{pendingReviewCount}</div>
           </CardContent>
         </Card>
       </div>

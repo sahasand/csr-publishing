@@ -58,24 +58,26 @@ export async function POST(request: NextRequest) {
     // Save file
     const { path, size } = await saveFile(file);
 
-    // Get next version
-    const existingCount = await db.document.count({
-      where: { studyId, slotId },
-    });
+    // Atomically determine next version and create document in a transaction
+    // to prevent race conditions from concurrent uploads to the same slot
+    const document = await db.$transaction(async (tx) => {
+      const existingCount = await tx.document.count({
+        where: { studyId, slotId },
+      });
 
-    // Create document record with PROCESSING status
-    const document = await db.document.create({
-      data: {
-        studyId,
-        slotId,
-        version: existingCount + 1,
-        sourceFileName: file.name,
-        sourcePath: path,
-        mimeType: file.type,
-        fileSize: size,
-        status: 'PROCESSING',
-      },
-      include: { slot: true },
+      return tx.document.create({
+        data: {
+          studyId,
+          slotId,
+          version: existingCount + 1,
+          sourceFileName: file.name,
+          sourcePath: path,
+          mimeType: file.type,
+          fileSize: size,
+          status: 'PROCESSING',
+        },
+        include: { slot: true },
+      });
     });
 
     // Create processing job record

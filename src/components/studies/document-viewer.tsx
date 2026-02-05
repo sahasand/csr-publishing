@@ -208,10 +208,7 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
       {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">
         {/* PDF Viewer - Left side */}
-        <div className={cn(
-          'flex-1 overflow-hidden transition-all duration-200',
-          showAnnotations ? 'mr-0' : 'mr-0'
-        )}>
+        <div className="flex-1 overflow-hidden">
           <PdfViewer
             url={pdfUrl}
             initialPage={currentPage}
