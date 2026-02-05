@@ -6,6 +6,9 @@
 
 ## Phase 1: eCTD XML Backbone Generation (Priority: Critical) ✅ COMPLETE
 
+## Maintenance: Production README (2026-02-05)
+- [x] Replace boilerplate README with project-specific local + Railway production steps
+
 ## Maintenance: TraceScribe UI Refresh (2026-02-05)
 - [x] Replace fonts with Plus Jakarta Sans and JetBrains Mono
 - [x] Add design token palette + shadows/animations in `globals.css`

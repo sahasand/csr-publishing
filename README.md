@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CSR Publishing
 
-## Getting Started
+CSR Publishing is a clinical study report (CSR) document management and eCTD packaging tool for regulatory submissions.
 
-First, run the development server:
+## Local Development
+
+### Prerequisites
+- Node.js >= 20.9
+- npm
+
+### Setup
+```bash
+npm install
+cp .env.example .env
+```
+
+### Database
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+```
+
+### Seed (optional)
+```bash
+npx tsx prisma/seed-template.ts
+npx tsx prisma/seed-validation-rules.ts
+```
+
+### Run
+```bash
+npm run dev
+```
+
+Open http://localhost:3000
+
+## Production (Railway)
+
+This project is configured for Railway via `railway.toml`.
+
+### 1) Create a Railway service
+Provision a persistent volume mounted at `/data`.
+
+### 2) Set environment variables
+```
+DATABASE_URL=file:/data/csr.db
+UPLOAD_DIR=/data/uploads
+EXPORTS_DIR=/data/exports
+NODE_ENV=production
+```
+
+### 3) Build/Deploy
+Railway uses:
+```
+npx prisma migrate deploy && npm start
+```
+
+### 4) One-time seed (optional)
+Run from a Railway shell or locally against the Railway database:
+```bash
+npx tsx prisma/seed-template.ts
+npx tsx prisma/seed-validation-rules.ts
+```
+
+### Notes
+- SQLite requires a single app instance unless you move to Postgres.
+- Ensure `/data/uploads` and `/data/exports` are writable on the Railway volume.
+
+## Commands
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run start
+npm run lint
+npm run test
+npm run test:run
+npm run test:coverage
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Environment Variables
+See `.env.example` for local defaults.
