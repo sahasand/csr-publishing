@@ -184,6 +184,18 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
                     </span>
                   </li>
                 )}
+                {readinessData.readiness.pendingApproval.length > 0 && (
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">*</span>
+                    <span>
+                      {readinessData.readiness.pendingApproval.length}{' '}
+                      {readinessData.readiness.pendingApproval.length === 1
+                        ? 'document is'
+                        : 'documents are'}{' '}
+                      not yet approved
+                    </span>
+                  </li>
+                )}
               </ul>
             )}
 
