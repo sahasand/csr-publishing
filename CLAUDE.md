@@ -23,6 +23,20 @@ CSR Publishing - A clinical study report (CSR) document management and eCTD pack
 - **Prisma 7**: Uses `@prisma/adapter-better-sqlite3` driver adapter
 - **JSON as strings**: SQLite doesn't support JSON type natively; `params` and `validationRules` are stored as JSON strings
 
+## Quick Start (First Time)
+
+```bash
+git clone https://github.com/sahasand/csr-publishing.git
+cd csr-publishing
+npm install
+cp .env.example .env
+npx prisma generate
+npx prisma migrate dev
+npx tsx prisma/seed-template.ts
+npx tsx prisma/seed-validation-rules.ts
+npm run dev
+```
+
 ## Common Commands
 
 ```bash
@@ -75,9 +89,57 @@ src/
 - **StructureTemplate**: eCTD folder structure template
 - **StructureNode**: Nodes in the template tree (sections/slots)
 - **Document**: Uploaded documents linked to study + slot
+- **DocumentStatusHistory**: Audit trail of document status transitions
 - **ProcessingJob**: Tracks document processing status
 - **ValidationRule/Result**: PDF validation rules and results
 - **Annotation**: Document review comments
+
+## Document Workflow
+
+Documents follow a status workflow for review and approval:
+
+```
+DRAFT → IN_REVIEW → APPROVED → PUBLISHED
+              ↓          ↓          ↓
+        CORRECTIONS_NEEDED ←────────┘
+```
+
+### Status Transitions
+
+| From | To | Comment Required |
+|------|-----|------------------|
+| DRAFT/PROCESSED | IN_REVIEW | No |
+| IN_REVIEW | APPROVED | No |
+| IN_REVIEW | CORRECTIONS_NEEDED | Yes |
+| APPROVED | PUBLISHED | No |
+| APPROVED | CORRECTIONS_NEEDED | Yes |
+| PUBLISHED | CORRECTIONS_NEEDED | Yes |
+| CORRECTIONS_NEEDED | IN_REVIEW | No |
+
+### Workflow API
+
+```typescript
+// Transition document status
+POST /api/documents/[id]/transition
+Body: { toStatus: "IN_REVIEW", comment?: string, userName?: string }
+
+// Get status history
+GET /api/documents/[id]/history
+```
+
+### Workflow Components
+
+- **StatusBadge**: Displays document status with colored badge
+- **WorkflowActions**: Transition buttons based on current status
+- **StatusHistory**: Audit trail showing all status changes
+
+```typescript
+import { StatusBadge, WorkflowActions, StatusHistory } from '@/components/workflow';
+```
+
+### Export Validation
+
+Export warns if documents are not APPROVED or PUBLISHED. Force export available for override.
 
 ## Prisma Notes
 
@@ -107,9 +169,33 @@ npm run test -- src/__tests__/api/studies.test.ts
 
 ## Deployment (Railway)
 
-Configured via `railway.toml`. Requires persistent volume at `/data`.
+Configured via `railway.toml`. Uses SQLite with persistent volume at `/data`.
 
-**Environment variables:**
+### Step 1: Initial Setup
+
+```bash
+# Login and create project
+railway login
+railway init
+
+# Link to existing project (if already created in dashboard)
+railway link
+```
+
+### Step 2: Add Persistent Volume
+
+**Critical**: SQLite data is lost on redeploy without a volume.
+
+```bash
+railway volume add --mount /data
+```
+
+Or via Railway Dashboard: Project → Settings → Volumes → Add Volume → Mount path: `/data`
+
+### Step 3: Set Environment Variables
+
+In Railway Dashboard → Variables, add:
+
 ```env
 DATABASE_URL=file:/data/csr.db
 UPLOAD_DIR=/data/uploads
@@ -117,13 +203,73 @@ EXPORTS_DIR=/data/exports
 NODE_ENV=production
 ```
 
-**Build command:** `prisma generate && next build`
-**Start command:** `prisma migrate deploy && npm start`
+### Step 4: Deploy
 
-**Deploy steps:**
-1. `railway login && railway init && railway up`
-2. Add persistent volume mounted at `/data`
-3. Set environment variables in Railway dashboard
+```bash
+railway up
+```
+
+Wait for build to complete. First deploy creates the database via `prisma migrate deploy`.
+
+### Step 5: Seed Production Database
+
+After first successful deploy, seed the templates:
+
+```bash
+# Open Railway shell
+railway shell
+
+# Inside the shell:
+npx tsx prisma/seed-template.ts
+npx tsx prisma/seed-validation-rules.ts
+exit
+```
+
+### Verify Deployment
+
+```bash
+# Check logs
+railway logs
+
+# Verify volume mounted correctly (should see /data directory)
+railway shell
+ls -la /data
+```
+
+### Redeployment
+
+```bash
+railway up                    # Deploy latest code
+railway logs --tail           # Watch deployment logs
+```
+
+### Troubleshooting
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| `SQLITE_CANTOPEN` | Volume not mounted | Verify volume exists at `/data` |
+| Build fails on `better-sqlite3` | Native module compilation | Railway handles this via nixpacks; ensure no conflicting Dockerfile |
+| Data lost after redeploy | Volume not configured | Add volume, re-seed database |
+| Health check fails | App slow to start | Increase `healthcheckTimeout` in railway.toml (default: 300s) |
+| `ENOENT uploads` | Directory doesn't exist | App auto-creates on first upload; check UPLOAD_DIR env var |
+
+### Access Production Database
+
+```bash
+railway shell
+npx prisma studio    # Opens GUI (requires port forwarding)
+
+# Or direct SQLite access
+sqlite3 /data/csr.db ".tables"
+```
+
+### Railway Config Reference
+
+`railway.toml`:
+- Builder: nixpacks (auto-detects Node.js)
+- Start: `prisma migrate deploy && npm start`
+- Health check: `GET /` with 300s timeout
+- Restart: On failure, max 3 retries
 
 ## ICH E3 Standard Sections
 
@@ -142,55 +288,8 @@ When creating a template via the UI, check "Start with ICH E3 standard sections"
 - UUID validation regex: `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
 - JSON fields stored as strings - use `JSON.stringify()` on write, `JSON.parse()` on read
 
-## Workflow Orchestration
+## Development Workflow
 
-### 1. Plan Mode Default
-- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
-- If something goes sideways, STOP and re-plan immediately – don't keep pushing
-- Use plan mode for verification steps, not just building
-- Write detailed specs upfront to reduce ambiguity
-
-### 2. Subagent Strategy
-- Use subagents liberally to keep main context window clean
-- Offload research, exploration, and parallel analysis to subagents
-- For complex problems, throw more compute at it via subagents
-- One task per subagent for focused execution
-
-### 3. Self-Improvement Loop
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern
-- Write rules for yourself that prevent the same mistake
-- Ruthlessly iterate on these lessons until mistake rate drops
-- Review lessons at session start for relevant project
-
-### 4. Verification Before Done
-- Never mark a task complete without proving it works
-- Diff behavior between main and your changes when relevant
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, demonstrate correctness
-
-### 5. Demand Elegance (Balanced)
-- For non-trivial changes: pause and ask "is there a more elegant way?"
-- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
-- Skip this for simple, obvious fixes – don't over-engineer
-- Challenge your own work before presenting it
-
-### 6. Autonomous Bug Fixing
-- When given a bug report: just fix it. Don't ask for hand-holding
-- Point at logs, errors, failing tests – then resolve them
-- Zero context switching required from the user
-- Go fix failing CI tests without being told how
-
-## Task Management
-
-1. **Plan First:** Write plan to `tasks/todo.md` with checkable items
-2. **Verify Plan:** Check in before starting implementation
-3. **Track Progress:** Mark items complete as you go
-4. **Explain Changes:** High-level summary at each step
-5. **Document Results:** Add review section to `tasks/todo.md`
-6. **Capture Lessons:** Update `tasks/lessons.md` after corrections
-
-## Core Principles
-
-- **Simplicity First:** Make every change as simple as possible. Impact minimal code.
-- **No Laziness:** Find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact:** Changes should only touch what's necessary. Avoid introducing bugs.
+- Plan changes in `tasks/todo.md` before implementing
+- Run `npm run test` and `npm run lint` before committing
+- Capture lessons/gotchas in `tasks/lessons.md`
