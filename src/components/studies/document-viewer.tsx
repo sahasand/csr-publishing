@@ -26,6 +26,7 @@ import {
   Loader2,
   AlertCircle,
   FileX,
+  Trash2,
 } from 'lucide-react';
 import type { Document, AnnotationWithReplies } from '@/types';
 
@@ -34,6 +35,8 @@ export interface DocumentViewerProps {
   documentId: string;
   /** Additional CSS classes */
   className?: string;
+  /** Callback when delete is requested */
+  onDeleteClick?: (document: Document) => void;
 }
 
 async function fetchDocument(documentId: string): Promise<Document> {
@@ -46,7 +49,7 @@ async function fetchDocument(documentId: string): Promise<Document> {
 /**
  * Full document viewing experience with PDF viewer and annotations panel
  */
-export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
+export function DocumentViewer({ documentId, className, onDeleteClick }: DocumentViewerProps) {
   // State
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
@@ -178,6 +181,19 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
             )}
             Annotations
           </Button>
+
+          {/* Delete button */}
+          {onDeleteClick && document && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDeleteClick(document)}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              title="Delete document"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 

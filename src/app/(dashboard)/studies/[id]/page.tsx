@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useStudy } from '@/hooks/use-studies';
-import { useStudyDocuments } from '@/hooks/use-documents';
+import { useStudyDocuments, useDeleteDocument } from '@/hooks/use-documents';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -15,6 +15,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { DocumentViewer } from '@/components/studies/document-viewer';
 import { DocumentUpload } from '@/components/studies/document-upload';
 import { ExportButton } from '@/components/packaging/export-button';
@@ -30,6 +38,7 @@ import {
   ChevronRight,
   CheckCircle,
   Circle,
+  Trash2,
 } from 'lucide-react';
 import type { StructureNode, Document } from '@/types';
 import { StudyValidationPanel } from '@/components/studies/study-validation-panel';
@@ -77,6 +86,10 @@ export default function StudyWorkspacePage() {
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+
+  const deleteDocument = useDeleteDocument();
 
   // Find the selected node from the template nodes
   const selectedNode = selectedNodeId && study?.activeTemplate?.nodes
@@ -123,6 +136,34 @@ export default function StudyWorkspacePage() {
   // Check if a node has documents
   const nodeHasDocuments = (nodeId: string) => {
     return documents.some((doc: Document) => doc.slotId === nodeId);
+  };
+
+  // Handle delete click
+  const handleDeleteClick = (doc: Document) => {
+    setDocumentToDelete(doc);
+    setDeleteDialogOpen(true);
+  };
+
+  // Handle delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!documentToDelete) return;
+    try {
+      await deleteDocument.mutateAsync(documentToDelete.id);
+      setDeleteDialogOpen(false);
+      setDocumentToDelete(null);
+      // If we were viewing this document, go back to the list
+      if (selectedDocumentId === documentToDelete.id) {
+        setSelectedDocumentId(null);
+      }
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+    }
+  };
+
+  // Handle delete cancel
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDocumentToDelete(null);
   };
 
   if (isLoading) {
@@ -282,7 +323,10 @@ export default function StudyWorkspacePage() {
 
         {/* Document Viewer */}
         <div className="flex-1 overflow-hidden">
-          <DocumentViewer documentId={selectedDocumentId} />
+          <DocumentViewer
+            documentId={selectedDocumentId}
+            onDeleteClick={handleDeleteClick}
+          />
         </div>
       </div>
     );
@@ -463,7 +507,7 @@ export default function StudyWorkspacePage() {
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                               <Badge
                                 variant={
                                   doc.status === 'APPROVED' || doc.status === 'PUBLISHED'
@@ -482,6 +526,14 @@ export default function StudyWorkspacePage() {
                               >
                                 <Eye className="h-4 w-4 mr-1" />
                                 View
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteClick(doc)}
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
@@ -624,6 +676,42 @@ export default function StudyWorkspacePage() {
           </div>
         </aside>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Document</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete &quot;{documentToDelete?.sourceFileName}&quot;?
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleDeleteCancel}
+              disabled={deleteDocument.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleteDocument.isPending}
+            >
+              {deleteDocument.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
