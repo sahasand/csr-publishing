@@ -32,7 +32,7 @@ export default function TemplatesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Structure Templates</h1>
+        <h1 className="text-2xl font-bold text-foreground">Structure Templates</h1>
         <Button onClick={() => setShowCreate(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Template
@@ -54,7 +54,7 @@ export default function TemplatesPage() {
           <CardContent>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-foreground/80">
                   Template Name *
                 </label>
                 <Input
@@ -70,9 +70,9 @@ export default function TemplatesPage() {
                   id="useStandardSections"
                   checked={useStandardSections}
                   onChange={(e) => setUseStandardSections(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300"
+                  className="h-4 w-4 rounded border-border"
                 />
-                <label htmlFor="useStandardSections" className="text-sm text-gray-700">
+                <label htmlFor="useStandardSections" className="text-sm text-foreground/80">
                   Start with ICH E3 standard sections (18 sections for Module 16)
                 </label>
               </div>
@@ -82,9 +82,9 @@ export default function TemplatesPage() {
                   id="isDefault"
                   checked={isDefault}
                   onChange={(e) => setIsDefault(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300"
+                  className="h-4 w-4 rounded border-border"
                 />
-                <label htmlFor="isDefault" className="text-sm text-gray-700">
+                <label htmlFor="isDefault" className="text-sm text-foreground/80">
                   Set as default template for new studies
                 </label>
               </div>

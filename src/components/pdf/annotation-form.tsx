@@ -114,7 +114,7 @@ export function AnnotationForm({
                 disabled={isSubmitting}
               />
               {maxPageNumber && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Pages 1-{maxPageNumber}
                 </p>
               )}
@@ -126,7 +126,7 @@ export function AnnotationForm({
             <Label htmlFor="annotation-content">Content</Label>
             <textarea
               id="annotation-content"
-              className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
+              className="flex min-h-[100px] w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 resize-y"
               placeholder="Enter your annotation..."
               value={content}
               onChange={(e) => setContent(e.target.value)}

@@ -6,6 +6,12 @@
 
 ## Phase 1: eCTD XML Backbone Generation (Priority: Critical) ✅ COMPLETE
 
+## Maintenance: TraceScribe UI Refresh (2026-02-05)
+- [x] Replace fonts with Plus Jakarta Sans and JetBrains Mono
+- [x] Add design token palette + shadows/animations in `globals.css`
+- [x] Update shared UI primitives to semantic tokens
+- [x] Restyle dashboard layout and key pages/components with new theme
+
 ### 1.1 Create XML Generator Module
 - [x] Create `src/lib/packaging/checksum.ts` for MD5 calculation
 - [x] Create `src/lib/packaging/xml-generator.ts` with core functions

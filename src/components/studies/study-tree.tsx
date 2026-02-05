@@ -206,7 +206,7 @@ export function StudyTree({
 
   if (nodes.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-muted-foreground">
         No nodes in this template yet.
       </div>
     );
@@ -252,20 +252,20 @@ function TreeNodeItem({
   const getIcon = () => {
     if (node.hasChildren) {
       return node.isExpanded ? (
-        <FolderOpen className="h-4 w-4 text-blue-500 flex-shrink-0" />
+        <FolderOpen className="h-4 w-4 text-primary flex-shrink-0" />
       ) : (
-        <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />
+        <Folder className="h-4 w-4 text-primary flex-shrink-0" />
       );
     }
 
     // Use document type icon if available
     if (node.documentType) {
       const IconComponent = documentTypeIcons[node.documentType] || File;
-      return <IconComponent className="h-4 w-4 text-gray-400 flex-shrink-0" />;
+      return <IconComponent className="h-4 w-4 text-muted-foreground/70 flex-shrink-0" />;
     }
 
     // Default to folder for nodes without document type (container nodes)
-    return <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />;
+    return <Folder className="h-4 w-4 text-primary flex-shrink-0" />;
   };
 
   // Get status badge color based on document status
@@ -291,7 +291,7 @@ function TreeNodeItem({
         variant={config.variant}
         className={cn(
           'text-[10px] px-1.5 py-0 min-w-[18px] justify-center',
-          nodeStatus === 'in_review' && 'bg-blue-500 text-white'
+          nodeStatus === 'in_review' && 'bg-primary text-white'
         )}
       >
         {config.label || documentCount}
@@ -302,10 +302,10 @@ function TreeNodeItem({
   // Get status indicator dot for the node
   const getStatusIndicator = () => {
     const statusColors: Record<NodeDocumentStatus, string> = {
-      empty: 'bg-gray-300',
-      has_draft: 'bg-yellow-400',
-      in_review: 'bg-blue-500',
-      all_approved: 'bg-green-500',
+      empty: 'bg-muted/70',
+      has_draft: 'bg-warning',
+      in_review: 'bg-primary',
+      all_approved: 'bg-success',
     };
 
     return (
@@ -350,8 +350,8 @@ function TreeNodeItem({
       <div
         className={cn(
           'flex items-center gap-1.5 py-1.5 px-2 rounded-md cursor-pointer transition-colors',
-          'hover:bg-gray-100',
-          isSelected && 'bg-blue-50 hover:bg-blue-100 ring-1 ring-blue-200'
+          'hover:bg-muted',
+          isSelected && 'bg-primary/10 hover:bg-primary/10 ring-1 ring-primary/30'
         )}
         style={{ paddingLeft: `${node.depth * 16 + 8}px` }}
         onClick={handleRowClick}
@@ -362,7 +362,7 @@ function TreeNodeItem({
         <button
           type="button"
           className={cn(
-            'flex items-center justify-center w-5 h-5 rounded hover:bg-gray-200 flex-shrink-0',
+            'flex items-center justify-center w-5 h-5 rounded hover:bg-muted/60 flex-shrink-0',
             !node.hasChildren && 'invisible'
           )}
           onClick={handleChevronClick}
@@ -370,9 +370,9 @@ function TreeNodeItem({
           aria-label={node.isExpanded ? 'Collapse' : 'Expand'}
         >
           {node.isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-gray-500" />
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-gray-500" />
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           )}
         </button>
 
@@ -383,7 +383,7 @@ function TreeNodeItem({
         {getStatusIndicator()}
 
         {/* Node code */}
-        <span className="font-mono text-xs text-gray-500 flex-shrink-0">
+        <span className="font-mono text-xs text-muted-foreground flex-shrink-0">
           {node.code}
         </span>
 
@@ -391,7 +391,7 @@ function TreeNodeItem({
         <span
           className={cn(
             'text-sm truncate flex-1',
-            isSelected ? 'text-gray-900 font-medium' : 'text-gray-700'
+            isSelected ? 'text-foreground font-medium' : 'text-foreground/80'
           )}
           title={node.title}
         >

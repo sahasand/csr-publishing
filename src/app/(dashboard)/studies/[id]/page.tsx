@@ -128,7 +128,7 @@ export default function StudyWorkspacePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
       </div>
     );
   }
@@ -142,7 +142,7 @@ export default function StudyWorkspacePage() {
             Back to Studies
           </Button>
         </Link>
-        <div className="text-center py-12 text-red-500">
+        <div className="text-center py-12 text-destructive">
           Failed to load study: {error.message}
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function StudyWorkspacePage() {
             Back to Studies
           </Button>
         </Link>
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-muted-foreground">
           Study not found
         </div>
       </div>
@@ -183,8 +183,8 @@ export default function StudyWorkspacePage() {
       assignTemplate.mutate(templates[0].id);
       return (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-          <span className="ml-3 text-gray-500">Setting up study...</span>
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
+          <span className="ml-3 text-muted-foreground">Setting up study...</span>
         </div>
       );
     }
@@ -200,11 +200,11 @@ export default function StudyWorkspacePage() {
             </Button>
           </Link>
 
-          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FolderTree className="h-8 w-8 text-yellow-600" />
+          <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FolderTree className="h-8 w-8 text-warning" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Create a Template First</h2>
-          <p className="text-gray-500 mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-2">Create a Template First</h2>
+          <p className="text-muted-foreground mb-6">
             A template defines the document sections for your study (like "Protocol", "Statistical Analysis Plan", etc.)
           </p>
           <Link href="/templates">
@@ -227,8 +227,8 @@ export default function StudyWorkspacePage() {
           </Button>
         </Link>
 
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Choose Document Structure</h2>
-        <p className="text-gray-500 mb-6">
+        <h2 className="text-xl font-bold text-foreground mb-2">Choose Document Structure</h2>
+        <p className="text-muted-foreground mb-6">
           Select which sections this study should have:
         </p>
 
@@ -238,11 +238,11 @@ export default function StudyWorkspacePage() {
               key={template.id}
               onClick={() => assignTemplate.mutate(template.id)}
               disabled={assignTemplate.isPending}
-              className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors text-left disabled:opacity-50"
+              className="w-full flex items-center justify-between p-4 border border-border rounded-lg hover:bg-primary/10 hover:border-primary/40 transition-colors text-left disabled:opacity-50"
             >
               <div>
-                <p className="font-medium text-gray-900">{template.name}</p>
-                <p className="text-sm text-gray-500">Version {template.version}</p>
+                <p className="font-medium text-foreground">{template.name}</p>
+                <p className="text-sm text-muted-foreground">Version {template.version}</p>
               </div>
               {template.isDefault && (
                 <Badge variant="outline">Recommended</Badge>
@@ -259,18 +259,18 @@ export default function StudyWorkspacePage() {
     return (
       <div className="h-full flex flex-col -m-8">
         {/* Document Viewer Header */}
-        <header className="flex-shrink-0 border-b border-gray-200 bg-white px-6 py-3">
+        <header className="flex-shrink-0 border-b border-border bg-card px-6 py-3">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" onClick={handleBackFromViewer}>
               <ChevronLeft className="h-4 w-4 mr-1" />
               Back to Study
             </Button>
-            <div className="h-4 w-px bg-gray-200" />
-            <span className="text-sm text-gray-600">
+            <div className="h-4 w-px bg-muted/60" />
+            <span className="text-sm text-muted-foreground">
               {study.studyId}
               {selectedNode && (
                 <>
-                  <span className="mx-2 text-gray-400">/</span>
+                  <span className="mx-2 text-muted-foreground/70">/</span>
                   <span className="font-mono text-xs">{selectedNode.code}</span>
                   <span className="mx-1">-</span>
                   {selectedNode.title}
@@ -291,7 +291,7 @@ export default function StudyWorkspacePage() {
   return (
     <div className="h-full flex flex-col -m-8">
       {/* Study Header */}
-      <header className="flex-shrink-0 border-b border-gray-200 bg-white px-6 py-4">
+      <header className="flex-shrink-0 border-b border-border bg-card px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/studies">
@@ -302,14 +302,14 @@ export default function StudyWorkspacePage() {
             </Link>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-xl font-bold text-foreground">
                   {study.studyId}
                 </h1>
                 <Badge variant={getStatusVariant(study.status)}>
                   {study.status}
                 </Badge>
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {study.sponsor}
                 {study.therapeuticArea && ` | ${study.therapeuticArea}`}
                 {study.phase && ` | ${study.phase}`}
@@ -317,7 +317,7 @@ export default function StudyWorkspacePage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               {sectionProgress.filled} of {sectionProgress.total} sections filled
             </span>
             <ExportButton studyId={id} />
@@ -328,15 +328,15 @@ export default function StudyWorkspacePage() {
       {/* Three-panel layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Structure Tree */}
-        <aside className="w-[280px] flex-shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto">
+        <aside className="w-[280px] flex-shrink-0 border-r border-border bg-muted/40 overflow-y-auto">
           <div className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <FolderTree className="h-4 w-4 text-gray-500" />
-              <h2 className="font-semibold text-sm text-gray-700">
+              <FolderTree className="h-4 w-4 text-muted-foreground" />
+              <h2 className="font-semibold text-sm text-foreground/80">
                 Document Sections
               </h2>
             </div>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-muted-foreground mb-4">
               Click a section to upload or view documents
             </p>
 
@@ -351,29 +351,29 @@ export default function StudyWorkspacePage() {
                     onClick={() => setSelectedNodeId(node.id)}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-2 ${
                       isSelected
-                        ? 'bg-blue-100 text-blue-900 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-primary/10 text-foreground font-medium'
+                        : 'text-muted-foreground hover:bg-muted'
                     }`}
                   >
                     {hasDoc ? (
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
                     ) : (
-                      <Circle className="h-4 w-4 text-gray-300 flex-shrink-0" />
+                      <Circle className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <span className="font-mono text-xs text-gray-400 mr-1">
+                      <span className="font-mono text-xs text-muted-foreground/70 mr-1">
                         {node.code}
                       </span>
                       <span className="truncate">{node.title}</span>
                     </div>
                     {isSelected && (
-                      <ChevronRight className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
                     )}
                   </button>
                 );
               })}
               {(!study.activeTemplate.nodes || study.activeTemplate.nodes.length === 0) && (
-                <div className="text-center py-6 text-gray-500">
+                <div className="text-center py-6 text-muted-foreground">
                   <p className="text-sm">No sections in template</p>
                   <Link href={`/templates/${study.activeTemplate.id}`}>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -387,18 +387,18 @@ export default function StudyWorkspacePage() {
         </aside>
 
         {/* Center Panel - Document Workspace */}
-        <main className="flex-1 overflow-y-auto bg-white">
+        <main className="flex-1 overflow-y-auto bg-background">
           <div className="p-6">
             {selectedNode ? (
               <div className="space-y-6">
                 {/* Section Header */}
                 <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                     <span>Section</span>
                     <ChevronRight className="h-3 w-3" />
                     <span className="font-mono">{selectedNode.code}</span>
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900">
+                  <h2 className="text-xl font-bold text-foreground">
                     {selectedNode.title}
                   </h2>
                   <div className="flex items-center gap-2 mt-2">
@@ -450,15 +450,15 @@ export default function StudyWorkspacePage() {
                         {nodeDocuments.map((doc: Document) => (
                           <div
                             key={doc.id}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                            className="flex items-center justify-between p-3 bg-muted/40 rounded-lg hover:bg-muted transition-colors"
                           >
                             <div className="flex items-center gap-3 min-w-0">
-                              <FileText className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                              <FileText className="h-5 w-5 text-muted-foreground/70 flex-shrink-0" />
                               <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">
+                                <p className="text-sm font-medium text-foreground truncate">
                                   {doc.sourceFileName}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-muted-foreground">
                                   v{doc.version} | {formatBytes(doc.fileSize)}
                                 </p>
                               </div>
@@ -495,38 +495,38 @@ export default function StudyWorkspacePage() {
               /* No Section Selected - Show Instructions */
               <div className="flex flex-col items-center justify-center h-full min-h-[500px]">
                 <div className="max-w-md text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ChevronLeft className="h-8 w-8 text-blue-500" />
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <ChevronLeft className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-xl font-bold text-foreground mb-2">
                     Select a Section
                   </h3>
-                  <p className="text-gray-500 mb-6">
+                  <p className="text-muted-foreground mb-6">
                     Choose a section from the list on the left to upload documents.
                     Each section represents a part of your submission package.
                   </p>
 
-                  <div className="bg-gray-50 rounded-lg p-4 text-left">
-                    <p className="text-sm font-medium text-gray-700 mb-2">How it works:</p>
-                    <ol className="text-sm text-gray-600 space-y-2">
+                  <div className="bg-muted/40 rounded-lg p-4 text-left">
+                    <p className="text-sm font-medium text-foreground/80 mb-2">How it works:</p>
+                    <ol className="text-sm text-muted-foreground space-y-2">
                       <li className="flex items-start gap-2">
-                        <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">1</span>
+                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">1</span>
                         <span>Click a section in the left panel</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">2</span>
+                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">2</span>
                         <span>Upload a document (PDF, Word, etc.)</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">3</span>
+                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">3</span>
                         <span>Repeat for each section</span>
                       </li>
                     </ol>
                   </div>
 
                   <div className="mt-4 flex items-center justify-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-gray-600">= section has a document</span>
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    <span className="text-muted-foreground">= section has a document</span>
                   </div>
                 </div>
               </div>
@@ -535,11 +535,11 @@ export default function StudyWorkspacePage() {
         </main>
 
         {/* Right Panel - Context Sidebar */}
-        <aside className="w-[280px] flex-shrink-0 border-l border-gray-200 bg-gray-50 overflow-y-auto">
+        <aside className="w-[280px] flex-shrink-0 border-l border-border bg-muted/40 overflow-y-auto">
           <div className="p-4">
             <div className="flex items-center gap-2 mb-4">
-              <Info className="h-4 w-4 text-gray-500" />
-              <h2 className="font-semibold text-sm text-gray-700">
+              <Info className="h-4 w-4 text-muted-foreground" />
+              <h2 className="font-semibold text-sm text-foreground/80">
                 Study Info
               </h2>
             </div>
@@ -549,14 +549,14 @@ export default function StudyWorkspacePage() {
               <Card>
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Progress</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm font-medium text-foreground/80">Progress</span>
+                    <span className="text-sm text-muted-foreground">
                       {sectionProgress.filled}/{sectionProgress.total}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-muted/60 rounded-full h-2">
                     <div
-                      className="bg-green-500 h-2 rounded-full transition-all"
+                      className="bg-success h-2 rounded-full transition-all"
                       style={{
                         width: `${sectionProgress.total > 0
                           ? (sectionProgress.filled / sectionProgress.total) * 100
@@ -564,7 +564,7 @@ export default function StudyWorkspacePage() {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     {sectionProgress.total - sectionProgress.filled} sections remaining
                   </p>
                 </CardContent>
@@ -583,23 +583,23 @@ export default function StudyWorkspacePage() {
                 <CardContent className="pt-4">
                   <dl className="space-y-2 text-sm">
                     <div>
-                      <dt className="text-gray-500">Study ID</dt>
-                      <dd className="font-medium text-gray-900">{study.studyId}</dd>
+                      <dt className="text-muted-foreground">Study ID</dt>
+                      <dd className="font-medium text-foreground">{study.studyId}</dd>
                     </div>
                     <div>
-                      <dt className="text-gray-500">Sponsor</dt>
-                      <dd className="font-medium text-gray-900">{study.sponsor}</dd>
+                      <dt className="text-muted-foreground">Sponsor</dt>
+                      <dd className="font-medium text-foreground">{study.sponsor}</dd>
                     </div>
                     {study.therapeuticArea && (
                       <div>
-                        <dt className="text-gray-500">Therapeutic Area</dt>
-                        <dd className="font-medium text-gray-900">{study.therapeuticArea}</dd>
+                        <dt className="text-muted-foreground">Therapeutic Area</dt>
+                        <dd className="font-medium text-foreground">{study.therapeuticArea}</dd>
                       </div>
                     )}
                     {study.phase && (
                       <div>
-                        <dt className="text-gray-500">Phase</dt>
-                        <dd className="font-medium text-gray-900">{study.phase}</dd>
+                        <dt className="text-muted-foreground">Phase</dt>
+                        <dd className="font-medium text-foreground">{study.phase}</dd>
                       </div>
                     )}
                   </dl>
@@ -610,11 +610,11 @@ export default function StudyWorkspacePage() {
               {study.activeTemplate && (
                 <Card>
                   <CardContent className="pt-4">
-                    <p className="text-xs text-gray-500 mb-1">Template</p>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-xs text-muted-foreground mb-1">Template</p>
+                    <p className="text-sm font-medium text-foreground">
                       {study.activeTemplate.name}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       v{study.activeTemplate.version} | {study.activeTemplate.nodes?.length || 0} sections
                     </p>
                   </CardContent>

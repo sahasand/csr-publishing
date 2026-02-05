@@ -4,7 +4,7 @@ export default function StudyDetailLoading() {
   return (
     <div className="flex h-full">
       {/* Structure tree sidebar */}
-      <div className="w-72 border-r border-gray-200 p-4 space-y-3">
+      <div className="w-72 border-r border-border p-4 space-y-3">
         <Skeleton className="h-6 w-48" />
         <div className="space-y-2 mt-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -23,7 +23,7 @@ export default function StudyDetailLoading() {
       </div>
 
       {/* Context sidebar */}
-      <div className="w-80 border-l border-gray-200 p-4 space-y-4">
+      <div className="w-80 border-l border-border p-4 space-y-4">
         <Skeleton className="h-6 w-32" />
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (

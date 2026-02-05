@@ -56,7 +56,7 @@ export function ValidationSummary({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-4">
-        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground/70" />
       </div>
     );
   }
@@ -65,7 +65,7 @@ export function ValidationSummary({
   if (!summary || total === 0) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           No validation results yet. Run validation to check this document.
         </p>
         <Button
@@ -96,20 +96,20 @@ export function ValidationSummary({
       {/* Summary Stats */}
       <div className="grid grid-cols-2 gap-2">
         {/* Passed */}
-        <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
-          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+        <div className="flex items-center gap-2 p-2 bg-success/10 rounded-md">
+          <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
           <div>
-            <p className="text-lg font-semibold text-green-700">{summary.passed}</p>
-            <p className="text-xs text-green-600">Passed</p>
+            <p className="text-lg font-semibold text-success">{summary.passed}</p>
+            <p className="text-xs text-success">Passed</p>
           </div>
         </div>
 
         {/* Failed */}
-        <div className="flex items-center gap-2 p-2 bg-red-50 rounded-md">
-          <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+        <div className="flex items-center gap-2 p-2 bg-destructive/10 rounded-md">
+          <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />
           <div>
-            <p className="text-lg font-semibold text-red-700">{summary.failed}</p>
-            <p className="text-xs text-red-600">Failed</p>
+            <p className="text-lg font-semibold text-destructive">{summary.failed}</p>
+            <p className="text-xs text-destructive">Failed</p>
           </div>
         </div>
       </div>
@@ -134,12 +134,12 @@ export function ValidationSummary({
 
       {/* Progress Bar */}
       <div className="space-y-1">
-        <div className="flex items-center justify-between text-xs text-gray-600">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Pass Rate</span>
           <span className="font-medium">{passPercentage}%</span>
         </div>
         <div
-          className="h-2 bg-gray-200 rounded-full overflow-hidden"
+          className="h-2 bg-muted/60 rounded-full overflow-hidden"
           role="progressbar"
           aria-valuenow={passPercentage}
           aria-valuemin={0}
@@ -150,12 +150,12 @@ export function ValidationSummary({
             className={cn(
               'h-full transition-all duration-300',
               allPassed
-                ? 'bg-green-500'
+                ? 'bg-success'
                 : hasErrors
-                ? 'bg-red-500'
+                ? 'bg-destructive'
                 : hasWarnings
-                ? 'bg-yellow-500'
-                : 'bg-blue-500'
+                ? 'bg-warning'
+                : 'bg-primary'
             )}
             style={{ width: `${passPercentage}%` }}
           />
@@ -164,16 +164,16 @@ export function ValidationSummary({
 
       {/* Status Message */}
       {allPassed && (
-        <div className="flex items-start gap-2 p-2 bg-green-50 rounded-md">
-          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-green-700">All validation checks passed</p>
+        <div className="flex items-start gap-2 p-2 bg-success/10 rounded-md">
+          <CheckCircle className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-success">All validation checks passed</p>
         </div>
       )}
 
       {hasErrors && (
-        <div className="flex items-start gap-2 p-2 bg-red-50 rounded-md">
-          <XCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-red-700">
+        <div className="flex items-start gap-2 p-2 bg-destructive/10 rounded-md">
+          <XCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-destructive">
             {summary.errors} validation error{summary.errors !== 1 ? 's' : ''} need
             attention
           </p>
@@ -181,9 +181,9 @@ export function ValidationSummary({
       )}
 
       {!hasErrors && hasWarnings && (
-        <div className="flex items-start gap-2 p-2 bg-yellow-50 rounded-md">
-          <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-yellow-700">
+        <div className="flex items-start gap-2 p-2 bg-warning/10 rounded-md">
+          <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-warning">
             {summary.warnings} warning{summary.warnings !== 1 ? 's' : ''} to review
           </p>
         </div>

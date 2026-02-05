@@ -329,7 +329,7 @@ export function NodeTree({ nodes, selectedNodeId, onSelectNode, onReorder }: Nod
 
   if (nodes.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-muted-foreground">
         No nodes in this template yet. Add nodes to define the document structure.
       </div>
     );
@@ -409,20 +409,20 @@ function SortableTreeNodeItem({
   const getIcon = () => {
     if (node.hasChildren) {
       return node.isExpanded ? (
-        <FolderOpen className="h-4 w-4 text-blue-500 flex-shrink-0" />
+        <FolderOpen className="h-4 w-4 text-primary flex-shrink-0" />
       ) : (
-        <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />
+        <Folder className="h-4 w-4 text-primary flex-shrink-0" />
       );
     }
 
     // Use document type icon if available
     if (node.documentType) {
       const IconComponent = documentTypeIcons[node.documentType] || File;
-      return <IconComponent className="h-4 w-4 text-gray-400 flex-shrink-0" />;
+      return <IconComponent className="h-4 w-4 text-muted-foreground/70 flex-shrink-0" />;
     }
 
     // Default to folder for nodes without document type (container nodes)
-    return <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />;
+    return <Folder className="h-4 w-4 text-primary flex-shrink-0" />;
   };
 
   const handleChevronClick = (e: React.MouseEvent) => {
@@ -458,9 +458,9 @@ function SortableTreeNodeItem({
       <div
         className={cn(
           'flex items-center gap-2 py-1.5 px-2 rounded-md cursor-pointer transition-colors',
-          'hover:bg-gray-100',
-          isSelected && 'bg-blue-50 hover:bg-blue-100 ring-1 ring-blue-200',
-          isOver && !isDragging && 'bg-blue-100 ring-2 ring-blue-400',
+          'hover:bg-muted',
+          isSelected && 'bg-primary/10 hover:bg-primary/10 ring-1 ring-primary/30',
+          isOver && !isDragging && 'bg-primary/10 ring-2 ring-primary/50',
           isDragging && 'opacity-50'
         )}
         style={{ paddingLeft: `${node.depth * 20 + 8}px` }}
@@ -471,21 +471,21 @@ function SortableTreeNodeItem({
         {/* Drag handle */}
         <button
           type="button"
-          className="flex items-center justify-center w-5 h-5 rounded hover:bg-gray-200 flex-shrink-0 cursor-grab active:cursor-grabbing touch-none"
+          className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted/60 flex-shrink-0 cursor-grab active:cursor-grabbing touch-none"
           {...attributes}
           {...listeners}
           tabIndex={-1}
           aria-label="Drag to reorder"
           onClick={(e) => e.stopPropagation()}
         >
-          <GripVertical className="h-4 w-4 text-gray-400" />
+          <GripVertical className="h-4 w-4 text-muted-foreground/70" />
         </button>
 
         {/* Expand/collapse chevron - only show if has children */}
         <button
           type="button"
           className={cn(
-            'flex items-center justify-center w-5 h-5 rounded hover:bg-gray-200 flex-shrink-0',
+            'flex items-center justify-center w-5 h-5 rounded hover:bg-muted/60 flex-shrink-0',
             !node.hasChildren && 'invisible'
           )}
           onClick={handleChevronClick}
@@ -493,9 +493,9 @@ function SortableTreeNodeItem({
           aria-label={node.isExpanded ? 'Collapse' : 'Expand'}
         >
           {node.isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-gray-500" />
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-gray-500" />
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           )}
         </button>
 
@@ -503,7 +503,7 @@ function SortableTreeNodeItem({
         {getIcon()}
 
         {/* Node code */}
-        <span className="font-mono text-sm text-gray-600 flex-shrink-0">
+        <span className="font-mono text-sm text-muted-foreground flex-shrink-0">
           {node.code}
         </span>
 
@@ -511,7 +511,7 @@ function SortableTreeNodeItem({
         <span
           className={cn(
             'text-sm truncate',
-            isSelected ? 'text-gray-900 font-medium' : 'text-gray-700'
+            isSelected ? 'text-foreground font-medium' : 'text-foreground/80'
           )}
           title={node.title}
         >
@@ -545,26 +545,26 @@ function SortableTreeNodeItem({
 function TreeNodeOverlay({ node }: { node: FlattenedNode }) {
   const getIcon = () => {
     if (node.hasChildren) {
-      return <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />;
+      return <Folder className="h-4 w-4 text-primary flex-shrink-0" />;
     }
     if (node.documentType) {
       const IconComponent = documentTypeIcons[node.documentType] || File;
-      return <IconComponent className="h-4 w-4 text-gray-400 flex-shrink-0" />;
+      return <IconComponent className="h-4 w-4 text-muted-foreground/70 flex-shrink-0" />;
     }
-    return <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />;
+    return <Folder className="h-4 w-4 text-primary flex-shrink-0" />;
   };
 
   return (
     <div
-      className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-white shadow-lg border border-blue-300 cursor-grabbing"
+      className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-card shadow-lg border border-primary/40 cursor-grabbing"
       style={{ paddingLeft: '8px', width: 'max-content', maxWidth: '400px' }}
     >
-      <GripVertical className="h-4 w-4 text-gray-400 flex-shrink-0" />
+      <GripVertical className="h-4 w-4 text-muted-foreground/70 flex-shrink-0" />
       {getIcon()}
-      <span className="font-mono text-sm text-gray-600 flex-shrink-0">
+      <span className="font-mono text-sm text-muted-foreground flex-shrink-0">
         {node.code}
       </span>
-      <span className="text-sm truncate text-gray-700">
+      <span className="text-sm truncate text-foreground/80">
         {node.title}
       </span>
     </div>

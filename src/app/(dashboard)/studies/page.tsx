@@ -35,7 +35,7 @@ export default function StudiesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Studies</h1>
+        <h1 className="text-2xl font-bold text-foreground">Studies</h1>
         <Button onClick={() => setShowCreate(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Study
@@ -58,7 +58,7 @@ export default function StudiesPage() {
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-foreground/80">
                     Study ID (Protocol Number) *
                   </label>
                   <Input
@@ -69,7 +69,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-foreground/80">
                     Sponsor *
                   </label>
                   <Input
@@ -80,7 +80,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-foreground/80">
                     Therapeutic Area
                   </label>
                   <Input
@@ -90,7 +90,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-foreground/80">
                     Phase
                   </label>
                   <Input

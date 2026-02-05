@@ -91,7 +91,7 @@ export default function TemplateEditorPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function TemplateEditorPage() {
             Back to Templates
           </Button>
         </Link>
-        <div className="text-center py-12 text-red-500">
+        <div className="text-center py-12 text-destructive">
           Failed to load template: {error.message}
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function TemplateEditorPage() {
             Back to Templates
           </Button>
         </Link>
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-muted-foreground">
           Template not found
         </div>
       </div>
@@ -167,7 +167,7 @@ export default function TemplateEditorPage() {
                       {updateTemplate.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-4 w-4 text-success" />
                       )}
                     </Button>
                     <Button
@@ -176,11 +176,11 @@ export default function TemplateEditorPage() {
                       onClick={handleCancelEdit}
                       disabled={updateTemplate.isPending}
                     >
-                      <X className="h-4 w-4 text-gray-500" />
+                      <X className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </div>
                   {saveError && (
-                    <div className="text-sm text-red-500">
+                    <div className="text-sm text-destructive">
                       Failed to save: {saveError}
                     </div>
                   )}
@@ -191,14 +191,14 @@ export default function TemplateEditorPage() {
                     {template.name}
                   </CardTitle>
                   {template.isDefault && (
-                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    <Star className="h-4 w-4 text-warning fill-warning" />
                   )}
                   <Button
                     size="icon"
                     variant="ghost"
                     onClick={startEditing}
                   >
-                    <Pencil className="h-4 w-4 text-gray-400" />
+                    <Pencil className="h-4 w-4 text-muted-foreground/70" />
                   </Button>
                 </div>
               )}
@@ -214,7 +214,7 @@ export default function TemplateEditorPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             {template.nodes.length} nodes in this template
           </div>
         </CardContent>
@@ -232,13 +232,13 @@ export default function TemplateEditorPage() {
               </CardDescription>
             </div>
             {reorderNodes.isPending && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Saving...
               </div>
             )}
             {reorderError && (
-              <div className="text-sm text-red-500">
+              <div className="text-sm text-destructive">
                 {reorderError}
               </div>
             )}

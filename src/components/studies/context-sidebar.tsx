@@ -187,14 +187,14 @@ export function ContextSidebar({
     return (
       <div className="h-full flex flex-col">
         <div className="flex items-center gap-2 mb-4">
-          <Info className="h-4 w-4 text-gray-500" />
-          <h2 className="font-semibold text-sm text-gray-700">Details</h2>
+          <Info className="h-4 w-4 text-muted-foreground" />
+          <h2 className="font-semibold text-sm text-foreground/80">Details</h2>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-          <FileQuestion className="h-12 w-12 mb-4 text-gray-300" />
-          <p className="text-sm text-gray-500 mb-1">No selection</p>
-          <p className="text-xs text-gray-400">
+          <FileQuestion className="h-12 w-12 mb-4 text-muted-foreground/50" />
+          <p className="text-sm text-muted-foreground mb-1">No selection</p>
+          <p className="text-xs text-muted-foreground/70">
             Select a section or document to view details
           </p>
         </div>
@@ -205,8 +205,8 @@ export function ContextSidebar({
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center gap-2 mb-4">
-        <Info className="h-4 w-4 text-gray-500" />
-        <h2 className="font-semibold text-sm text-gray-700">Details</h2>
+        <Info className="h-4 w-4 text-muted-foreground" />
+        <h2 className="font-semibold text-sm text-foreground/80">Details</h2>
       </div>
 
       <div className="space-y-4 overflow-y-auto flex-1">
@@ -219,17 +219,17 @@ export function ContextSidebar({
             <CardContent>
               <dl className="space-y-3 text-sm">
                 <div>
-                  <dt className="text-gray-500">Code</dt>
-                  <dd className="font-mono font-medium text-gray-900">
+                  <dt className="text-muted-foreground">Code</dt>
+                  <dd className="font-mono font-medium text-foreground">
                     {node.code}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Title</dt>
-                  <dd className="font-medium text-gray-900">{node.title}</dd>
+                  <dt className="text-muted-foreground">Title</dt>
+                  <dd className="font-medium text-foreground">{node.title}</dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Document Type</dt>
+                  <dt className="text-muted-foreground">Document Type</dt>
                   <dd>
                     {node.documentType ? (
                       <Badge
@@ -242,12 +242,12 @@ export function ContextSidebar({
                           node.documentType}
                       </Badge>
                     ) : (
-                      <span className="text-gray-400">Not specified</span>
+                      <span className="text-muted-foreground/70">Not specified</span>
                     )}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Required</dt>
+                  <dt className="text-muted-foreground">Required</dt>
                   <dd>
                     <Badge variant={node.required ? 'warning' : 'secondary'}>
                       {node.required ? 'Required' : 'Optional'}
@@ -264,29 +264,29 @@ export function ContextSidebar({
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
-                <FileText className="h-4 w-4 text-gray-400" />
+                <FileText className="h-4 w-4 text-muted-foreground/70" />
                 Document Details
               </CardTitle>
             </CardHeader>
             <CardContent>
               <dl className="space-y-3 text-sm">
                 <div>
-                  <dt className="text-gray-500">Filename</dt>
+                  <dt className="text-muted-foreground">Filename</dt>
                   <dd
-                    className="font-medium text-gray-900 truncate"
+                    className="font-medium text-foreground truncate"
                     title={document.sourceFileName}
                   >
                     {document.sourceFileName}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Version</dt>
-                  <dd className="font-medium text-gray-900">
+                  <dt className="text-muted-foreground">Version</dt>
+                  <dd className="font-medium text-foreground">
                     v{document.version}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Status</dt>
+                  <dt className="text-muted-foreground">Status</dt>
                   <dd>
                     <Badge
                       variant={
@@ -306,13 +306,13 @@ export function ContextSidebar({
 
         {/* Processing Status Section */}
         {document && (isProcessing || isFailed) && processingJob && (
-          <Card className={cn(isFailed && 'border-red-200 bg-red-50/30')}>
+          <Card className={cn(isFailed && 'border-destructive/30 bg-destructive/10')}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 {isProcessing ? (
                   <Loader2 className="h-4 w-4 text-amber-500 animate-spin" />
                 ) : (
-                  <AlertCircle className="h-4 w-4 text-red-500" />
+                  <AlertCircle className="h-4 w-4 text-destructive" />
                 )}
                 Processing Status
               </CardTitle>
@@ -321,7 +321,7 @@ export function ContextSidebar({
               <div className="space-y-3">
                 {/* Job Type */}
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Job Type</span>
+                  <span className="text-muted-foreground">Job Type</span>
                   <Badge variant="outline">
                     {processingJob.jobType.replace(/_/g, ' ')}
                   </Badge>
@@ -329,7 +329,7 @@ export function ContextSidebar({
 
                 {/* Status */}
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Status</span>
+                  <span className="text-muted-foreground">Status</span>
                   <Badge
                     variant={
                       currentJobStatus === 'RUNNING'
@@ -349,11 +349,11 @@ export function ContextSidebar({
                 {isProcessing && (
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500">Progress</span>
-                      <span className="text-gray-700">{currentJobProgress}%</span>
+                      <span className="text-muted-foreground">Progress</span>
+                      <span className="text-foreground/80">{currentJobProgress}%</span>
                     </div>
                     <div
-                      className="h-2 bg-gray-200 rounded-full overflow-hidden"
+                      className="h-2 bg-muted/60 rounded-full overflow-hidden"
                       role="progressbar"
                       aria-valuenow={currentJobProgress}
                       aria-valuemin={0}
@@ -369,9 +369,9 @@ export function ContextSidebar({
 
                 {/* Error Message */}
                 {isFailed && processingJob.error && (
-                  <div className="p-2 bg-red-100 rounded-md">
-                    <p className="text-xs text-red-700 font-medium mb-1">Error:</p>
-                    <p className="text-xs text-red-600">{processingJob.error}</p>
+                  <div className="p-2 bg-destructive/10 rounded-md">
+                    <p className="text-xs text-destructive font-medium mb-1">Error:</p>
+                    <p className="text-xs text-destructive">{processingJob.error}</p>
                   </div>
                 )}
 
@@ -411,29 +411,29 @@ export function ContextSidebar({
             <CardContent>
               <dl className="space-y-3 text-sm">
                 <div>
-                  <dt className="text-gray-500">File Size</dt>
-                  <dd className="font-medium text-gray-900">
+                  <dt className="text-muted-foreground">File Size</dt>
+                  <dd className="font-medium text-foreground">
                     {formatBytes(document.fileSize)}
                   </dd>
                 </div>
                 {document.pageCount !== null && document.pageCount !== undefined && (
                   <div>
-                    <dt className="text-gray-500">Page Count</dt>
-                    <dd className="font-medium text-gray-900">
+                    <dt className="text-muted-foreground">Page Count</dt>
+                    <dd className="font-medium text-foreground">
                       {document.pageCount} {document.pageCount === 1 ? 'page' : 'pages'}
                     </dd>
                   </div>
                 )}
                 {document.pdfVersion && (
                   <div>
-                    <dt className="text-gray-500">PDF Version</dt>
-                    <dd className="font-medium text-gray-900">
+                    <dt className="text-muted-foreground">PDF Version</dt>
+                    <dd className="font-medium text-foreground">
                       {document.pdfVersion}
                     </dd>
                   </div>
                 )}
                 <div>
-                  <dt className="text-gray-500">PDF/A Compliant</dt>
+                  <dt className="text-muted-foreground">PDF/A Compliant</dt>
                   <dd>
                     <Badge variant={document.isPdfA ? 'success' : 'outline'}>
                       {document.isPdfA ? 'Yes' : 'No'}
@@ -441,12 +441,12 @@ export function ContextSidebar({
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Created</dt>
-                  <dd className="text-gray-900">{formatDate(document.createdAt)}</dd>
+                  <dt className="text-muted-foreground">Created</dt>
+                  <dd className="text-foreground">{formatDate(document.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Last Updated</dt>
-                  <dd className="text-gray-900">{formatDate(document.updatedAt)}</dd>
+                  <dt className="text-muted-foreground">Last Updated</dt>
+                  <dd className="text-foreground">{formatDate(document.updatedAt)}</dd>
                 </div>
               </dl>
             </CardContent>
@@ -459,7 +459,7 @@ export function ContextSidebar({
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-gray-400" />
+                  <Shield className="h-4 w-4 text-muted-foreground/70" />
                   Validation
                 </div>
                 {validationSummary && validationSummary.total > 0 && (
@@ -490,10 +490,10 @@ export function ContextSidebar({
 
               {/* Expandable Validation Details */}
               {validationData && validationData.results.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-gray-200">
+                <div className="mt-3 pt-3 border-t border-border">
                   <button
                     type="button"
-                    className="w-full flex items-center justify-between text-xs text-gray-600 hover:text-gray-900 transition-colors"
+                    className="w-full flex items-center justify-between text-xs text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setIsValidationExpanded(!isValidationExpanded)}
                     aria-expanded={isValidationExpanded}
                     aria-controls="validation-details"
@@ -526,7 +526,7 @@ export function ContextSidebar({
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ClipboardCheck className="h-4 w-4 text-gray-400" />
+                  <ClipboardCheck className="h-4 w-4 text-muted-foreground/70" />
                   QC Checklist
                 </div>
                 {checklistResponse && (
@@ -541,7 +541,7 @@ export function ContextSidebar({
             <CardContent>
               {isChecklistLoading ? (
                 <div className="flex items-center justify-center py-4">
-                  <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/70" />
                 </div>
               ) : checklistResponse ? (
                 <ChecklistPanel documentId={document.id} />
@@ -568,13 +568,13 @@ export function ContextSidebar({
                 aria-controls="packaging-section"
               >
                 <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-gray-400" />
+                  <Package className="h-4 w-4 text-muted-foreground/70" />
                   Packaging
                 </div>
                 {isPackagingExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-gray-400" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground/70" />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/70" />
                 )}
               </button>
             </CardTitle>
@@ -607,7 +607,7 @@ export function ContextSidebar({
                 {exportResult && (
                   <button
                     type="button"
-                    className="text-xs text-gray-500 underline hover:no-underline w-full text-center"
+                    className="text-xs text-muted-foreground underline hover:no-underline w-full text-center"
                     onClick={() => setExportResult(null)}
                   >
                     Export another package
@@ -643,7 +643,7 @@ export function ContextSidebar({
                 <div className="space-y-1.5">
                   <label
                     htmlFor="status-select"
-                    className="text-xs text-gray-500"
+                    className="text-xs text-muted-foreground"
                   >
                     Change Status
                   </label>
@@ -669,7 +669,7 @@ export function ContextSidebar({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
                   onClick={onDeleteClick}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
@@ -679,7 +679,7 @@ export function ContextSidebar({
 
               {/* Show message if no actions available */}
               {node && !document && !onUploadClick && (
-                <p className="text-xs text-gray-400 text-center py-2">
+                <p className="text-xs text-muted-foreground/70 text-center py-2">
                   No actions available
                 </p>
               )}

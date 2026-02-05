@@ -66,20 +66,20 @@ export const PdfPage = memo(function PdfPage({
     >
       {/* Loading state overlay */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-muted/40 z-10">
           <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-            <span className="text-sm text-gray-500">Loading page {pageNumber}...</span>
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
+            <span className="text-sm text-muted-foreground">Loading page {pageNumber}...</span>
           </div>
         </div>
       )}
 
       {/* Error state */}
       {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-red-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-destructive/10 z-10">
           <div className="text-center p-4">
-            <p className="text-red-600 font-medium">Failed to load page {pageNumber}</p>
-            <p className="text-sm text-red-500 mt-1">Please try refreshing</p>
+            <p className="text-destructive font-medium">Failed to load page {pageNumber}</p>
+            <p className="text-sm text-destructive mt-1">Please try refreshing</p>
           </div>
         </div>
       )}
@@ -117,12 +117,12 @@ export function PdfPageSkeleton({
   return (
     <div
       className={cn(
-        'bg-gray-100 animate-pulse shadow-md flex items-center justify-center',
+        'bg-muted animate-pulse shadow-md flex items-center justify-center',
         className
       )}
       style={{ width, height }}
     >
-      <Loader2 className="h-8 w-8 animate-spin text-gray-300" />
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/50" />
     </div>
   );
 }

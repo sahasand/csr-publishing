@@ -99,8 +99,8 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
     return (
       <div className={cn('flex items-center justify-center h-full', className)}>
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-          <p className="text-sm text-gray-500">Loading document...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
+          <p className="text-sm text-muted-foreground">Loading document...</p>
         </div>
       </div>
     );
@@ -111,11 +111,11 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
     return (
       <div className={cn('flex items-center justify-center h-full', className)}>
         <div className="flex flex-col items-center gap-4 max-w-md text-center">
-          <AlertCircle className="h-12 w-12 text-red-500" />
-          <h3 className="text-lg font-medium text-gray-900">
+          <AlertCircle className="h-12 w-12 text-destructive" />
+          <h3 className="text-lg font-medium text-foreground">
             Failed to load document
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             {error instanceof Error ? error.message : 'An error occurred while loading the document.'}
           </p>
         </div>
@@ -128,11 +128,11 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
     return (
       <div className={cn('flex items-center justify-center h-full', className)}>
         <div className="flex flex-col items-center gap-4 max-w-md text-center">
-          <FileX className="h-12 w-12 text-gray-400" />
-          <h3 className="text-lg font-medium text-gray-900">
+          <FileX className="h-12 w-12 text-muted-foreground/70" />
+          <h3 className="text-lg font-medium text-foreground">
             Document not found
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             The requested document could not be found.
           </p>
         </div>
@@ -143,24 +143,24 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border flex-shrink-0">
         <div className="flex items-center gap-4">
-          <h2 className="text-sm font-medium text-gray-900 truncate max-w-[300px]" title={document.sourceFileName}>
+          <h2 className="text-sm font-medium text-foreground truncate max-w-[300px]" title={document.sourceFileName}>
             {document.sourceFileName}
           </h2>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-muted-foreground">
             v{document.version}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Page info display */}
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-muted-foreground">
             Page {currentPage} of {totalPages || '...'}
           </span>
 
           {/* Zoom info display */}
-          <span className="text-xs text-gray-500 mx-2">
+          <span className="text-xs text-muted-foreground mx-2">
             {zoom}%
           </span>
 
@@ -203,7 +203,7 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
 
         {/* Annotation Panel - Right side (collapsible) */}
         {showAnnotations && (
-          <aside className="w-[320px] flex-shrink-0 border-l border-gray-200 bg-gray-50 overflow-hidden">
+          <aside className="w-[320px] flex-shrink-0 border-l border-border bg-muted/40 overflow-hidden">
             <div className="h-full overflow-y-auto p-4">
               <AnnotationPanel
                 documentId={documentId}

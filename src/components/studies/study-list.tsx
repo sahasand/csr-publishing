@@ -21,14 +21,14 @@ export function StudyList() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12 text-red-500">
+      <div className="text-center py-12 text-destructive">
         Failed to load studies: {error.message}
       </div>
     );
@@ -37,7 +37,7 @@ export function StudyList() {
   if (!studies?.length) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-gray-500">
+        <CardContent className="py-12 text-center text-muted-foreground">
           No studies found. Create your first study to get started.
         </CardContent>
       </Card>
@@ -67,7 +67,7 @@ export function StudyList() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 <span>{study._count?.documents || 0} documents</span>
                 <span className="mx-2">·</span>
                 <span>Updated {formatDate(study.updatedAt)}</span>
@@ -95,7 +95,7 @@ export function StudyList() {
                   }}
                   disabled={deleteStudy.isPending}
                 >
-                  <Trash2 className="h-4 w-4 text-red-500" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
             </div>

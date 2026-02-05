@@ -324,13 +324,13 @@ export function PdfViewer({
     <div
       ref={containerRef}
       className={cn(
-        'flex flex-col h-full bg-gray-100 overflow-hidden',
+        'flex flex-col h-full bg-muted overflow-hidden',
         className
       )}
     >
       {/* Toolbar */}
       {showToolbar && (
-        <div className="flex items-center justify-between gap-4 px-4 py-2 bg-white border-b border-gray-200 flex-shrink-0">
+        <div className="flex items-center justify-between gap-4 px-4 py-2 bg-card border-b border-border flex-shrink-0">
           {/* Page Navigation */}
           <div className="flex items-center gap-2">
             <Button
@@ -362,7 +362,7 @@ export function PdfViewer({
                 disabled={isLoading}
                 aria-label="Current page"
               />
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-muted-foreground">
                 / {numPages || '...'}
               </span>
             </form>
@@ -411,7 +411,7 @@ export function PdfViewer({
                   setZoomWithBounds(parseInt(value, 10));
                 }
               }}
-              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+              className="h-8 px-2 text-sm border border-border rounded-md bg-background"
               disabled={isLoading}
               aria-label="Zoom level"
             >
@@ -437,7 +437,7 @@ export function PdfViewer({
               <ZoomIn className="h-4 w-4" />
             </Button>
 
-            <div className="h-4 w-px bg-gray-200 mx-1" />
+            <div className="h-4 w-px bg-muted/60 mx-1" />
 
             <Button
               variant={zoomMode === 'fit-width' ? 'default' : 'ghost'}
@@ -471,11 +471,11 @@ export function PdfViewer({
         {/* Error State */}
         {error && (
           <div className="flex flex-col items-center justify-center h-full p-8">
-            <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">
               Failed to load PDF
             </h3>
-            <p className="text-sm text-gray-500 text-center max-w-md">
+            <p className="text-sm text-muted-foreground text-center max-w-md">
               {error.message || 'An error occurred while loading the PDF document.'}
             </p>
             <Button
@@ -494,8 +494,8 @@ export function PdfViewer({
         {/* Loading State */}
         {isLoading && !error && (
           <div className="flex flex-col items-center justify-center h-full p-8">
-            <Loader2 className="h-12 w-12 animate-spin text-gray-400 mb-4" />
-            <p className="text-sm text-gray-500">Loading PDF document...</p>
+            <Loader2 className="h-12 w-12 animate-spin text-muted-foreground/70 mb-4" />
+            <p className="text-sm text-muted-foreground">Loading PDF document...</p>
           </div>
         )}
 

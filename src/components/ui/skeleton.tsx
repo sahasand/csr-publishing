@@ -7,7 +7,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
-      className={cn('animate-pulse rounded-md bg-gray-200', className)}
+      className={cn('animate-pulse rounded-md bg-muted', className)}
       {...props}
     />
   );
@@ -20,7 +20,7 @@ export function SkeletonText({ className, ...props }: SkeletonProps) {
 
 export function SkeletonCard({ className, ...props }: SkeletonProps) {
   return (
-    <div className={cn('rounded-xl border border-gray-200 p-6 space-y-4', className)} {...props}>
+    <div className={cn('rounded-2xl border border-border p-6 space-y-4 bg-card', className)} {...props}>
       <Skeleton className="h-6 w-3/4" />
       <Skeleton className="h-4 w-1/2" />
       <div className="flex gap-2 pt-2">
@@ -43,14 +43,14 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
 
 export function SkeletonTable({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="bg-gray-50 border-b px-4 py-3 flex gap-4">
+    <div className="border border-border rounded-lg overflow-hidden bg-card">
+      <div className="bg-muted/60 border-b border-border px-4 py-3 flex gap-4">
         {Array.from({ length: cols }).map((_, i) => (
           <Skeleton key={i} className="h-4 flex-1" />
         ))}
       </div>
       {Array.from({ length: rows }).map((_, rowIdx) => (
-        <div key={rowIdx} className="px-4 py-3 border-b last:border-0 flex gap-4">
+        <div key={rowIdx} className="px-4 py-3 border-b border-border last:border-0 flex gap-4">
           {Array.from({ length: cols }).map((_, colIdx) => (
             <Skeleton key={colIdx} className="h-4 flex-1" />
           ))}

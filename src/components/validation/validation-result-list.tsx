@@ -34,9 +34,9 @@ const categoryLabels: Record<ValidationCategoryType, string> = {
  * Category header colors
  */
 const categoryColors: Record<ValidationCategoryType, string> = {
-  PDF_COMPLIANCE: 'bg-blue-50 border-blue-200',
+  PDF_COMPLIANCE: 'bg-primary/10 border-primary/30',
   ECTD_TECHNICAL: 'bg-purple-50 border-purple-200',
-  FORMATTING: 'bg-green-50 border-green-200',
+  FORMATTING: 'bg-success/10 border-success/30',
   CONTENT: 'bg-amber-50 border-amber-200',
 };
 
@@ -156,7 +156,7 @@ export function ValidationResultList({
 
   if (results.length === 0) {
     return (
-      <div className="text-sm text-gray-500 text-center py-8">
+      <div className="text-sm text-muted-foreground text-center py-8">
         No validation results available
       </div>
     );
@@ -167,7 +167,7 @@ export function ValidationResultList({
       <div className="space-y-4">
         {/* Filter Dropdown */}
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-400" />
+          <Filter className="h-4 w-4 text-muted-foreground/70" />
           <Select
             value={filter}
             onChange={(e) => handleFilterChange(e.target.value as FilterSeverity)}
@@ -182,7 +182,7 @@ export function ValidationResultList({
           </Select>
         </div>
 
-        <div className="text-sm text-gray-500 text-center py-4">
+        <div className="text-sm text-muted-foreground text-center py-4">
           No results match the selected filter
         </div>
       </div>
@@ -193,7 +193,7 @@ export function ValidationResultList({
     <div className="space-y-4">
       {/* Filter Dropdown */}
       <div className="flex items-center gap-2">
-        <Filter className="h-4 w-4 text-gray-400" />
+        <Filter className="h-4 w-4 text-muted-foreground/70" />
         <Select
           value={filter}
           onChange={(e) => handleFilterChange(e.target.value as FilterSeverity)}
@@ -206,7 +206,7 @@ export function ValidationResultList({
             </option>
           ))}
         </Select>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-muted-foreground">
           {filteredResults.length} result{filteredResults.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -228,18 +228,18 @@ export function ValidationResultList({
               {/* Category Header */}
               <button
                 type="button"
-                className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-white/50 transition-colors"
+                className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-muted/40 transition-colors"
                 onClick={() => toggleCategory(category)}
                 aria-expanded={isExpanded}
                 aria-controls={`category-${category}`}
               >
                 <div className="flex items-center gap-2">
                   {isExpanded ? (
-                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   ) : (
-                    <ChevronRight className="h-4 w-4 text-gray-500" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   )}
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-foreground/80">
                     {categoryLabels[category]}
                   </span>
                 </div>
@@ -255,7 +255,7 @@ export function ValidationResultList({
                       {counts.warnings} warning{counts.warnings !== 1 ? 's' : ''}
                     </Badge>
                   )}
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {counts.passed}/{counts.total} passed
                   </span>
                 </div>
@@ -265,7 +265,7 @@ export function ValidationResultList({
               {isExpanded && (
                 <div
                   id={`category-${category}`}
-                  className="px-3 pb-3 space-y-2 bg-white/30"
+                  className="px-3 pb-3 space-y-2 bg-card/30"
                 >
                   {groupedResults[category].map((result) => (
                     <ValidationResultItem key={result.id} result={result} />

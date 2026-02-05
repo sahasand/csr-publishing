@@ -27,21 +27,21 @@ interface ReadinessItemProps {
 function ReadinessItem({ label, passed, value, warning }: ReadinessItemProps) {
   const Icon = passed ? CheckCircle : warning ? AlertTriangle : XCircle;
   const iconColor = passed
-    ? 'text-green-500'
+    ? 'text-success'
     : warning
-    ? 'text-yellow-500'
-    : 'text-red-500';
+    ? 'text-warning'
+    : 'text-destructive';
 
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2">
         <Icon className={cn('h-4 w-4', iconColor)} />
-        <span className="text-sm text-gray-700">{label}</span>
+        <span className="text-sm text-foreground/80">{label}</span>
       </div>
       <span
         className={cn(
           'text-sm font-medium',
-          passed ? 'text-gray-600' : warning ? 'text-yellow-600' : 'text-red-600'
+          passed ? 'text-muted-foreground' : warning ? 'text-warning' : 'text-destructive'
         )}
       >
         {value}
@@ -61,8 +61,8 @@ export function ReadinessPanel({ studyId }: ReadinessPanelProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-6">
-            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            <span className="ml-2 text-sm text-gray-500">Checking readiness...</span>
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground/70" />
+            <span className="ml-2 text-sm text-muted-foreground">Checking readiness...</span>
           </div>
         </CardContent>
       </Card>
@@ -71,20 +71,20 @@ export function ReadinessPanel({ studyId }: ReadinessPanelProps) {
 
   if (error) {
     return (
-      <Card className="border-red-200 bg-red-50/30">
+      <Card className="border-destructive/30 bg-destructive/10">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-red-500" />
+            <AlertCircle className="h-4 w-4 text-destructive" />
             Package Readiness
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-red-600 mb-2">
+          <p className="text-sm text-destructive mb-2">
             {error instanceof Error ? error.message : 'Failed to check readiness'}
           </p>
           <button
             type="button"
-            className="text-xs text-red-600 underline hover:no-underline"
+            className="text-xs text-destructive underline hover:no-underline"
             onClick={() => refetch()}
           >
             Retry
@@ -117,7 +117,7 @@ export function ReadinessPanel({ studyId }: ReadinessPanelProps) {
   const populatedRequiredNodes = totalRequiredNodes - missingRequired.length;
 
   return (
-    <Card className={cn(ready ? 'border-green-200' : 'border-yellow-200')}>
+    <Card className={cn(ready ? 'border-success/30' : 'border-warning/30')}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center justify-between">
           <span>Package Readiness</span>
@@ -170,23 +170,23 @@ export function ReadinessPanel({ studyId }: ReadinessPanelProps) {
 
         {/* Missing required nodes list */}
         {missingRequired.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-gray-200">
-            <h4 className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
-              <XCircle className="h-3.5 w-3.5 text-red-500" />
+          <div className="mt-4 pt-3 border-t border-border">
+            <h4 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+              <XCircle className="h-3.5 w-3.5 text-destructive" />
               Missing Required Sections ({missingRequired.length})
             </h4>
             <ul className="space-y-1.5">
               {missingRequired.slice(0, 5).map((node) => (
                 <li
                   key={node.nodeId}
-                  className="text-xs text-gray-600 flex items-start gap-2"
+                  className="text-xs text-muted-foreground flex items-start gap-2"
                 >
-                  <span className="font-mono text-gray-500 shrink-0">{node.code}</span>
+                  <span className="font-mono text-muted-foreground shrink-0">{node.code}</span>
                   <span className="truncate">{node.title}</span>
                 </li>
               ))}
               {missingRequired.length > 5 && (
-                <li className="text-xs text-gray-400 italic">
+                <li className="text-xs text-muted-foreground/70 italic">
                   +{missingRequired.length - 5} more...
                 </li>
               )}
@@ -196,16 +196,16 @@ export function ReadinessPanel({ studyId }: ReadinessPanelProps) {
 
         {/* Pending approval documents list */}
         {pendingApproval.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-gray-200">
-            <h4 className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
-              <FileText className="h-3.5 w-3.5 text-yellow-500" />
+          <div className="mt-4 pt-3 border-t border-border">
+            <h4 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+              <FileText className="h-3.5 w-3.5 text-warning" />
               Pending Approval ({pendingApproval.length})
             </h4>
             <ul className="space-y-1.5">
               {pendingApproval.slice(0, 5).map((doc) => (
                 <li
                   key={doc.documentId}
-                  className="text-xs text-gray-600 flex items-center justify-between gap-2"
+                  className="text-xs text-muted-foreground flex items-center justify-between gap-2"
                 >
                   <span className="truncate" title={doc.fileName}>
                     {doc.fileName}
@@ -216,7 +216,7 @@ export function ReadinessPanel({ studyId }: ReadinessPanelProps) {
                 </li>
               ))}
               {pendingApproval.length > 5 && (
-                <li className="text-xs text-gray-400 italic">
+                <li className="text-xs text-muted-foreground/70 italic">
                   +{pendingApproval.length - 5} more...
                 </li>
               )}

@@ -70,8 +70,8 @@ export default function SettingsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500 mt-1">Manage application configuration</p>
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground mt-1">Manage application configuration</p>
       </div>
 
       <div className="grid gap-6">
@@ -87,24 +87,24 @@ export default function SettingsPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500">Application</p>
+                <p className="text-sm font-medium text-muted-foreground">Application</p>
                 <p className="text-sm">CSR Publishing</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500">Database</p>
+                <p className="text-sm font-medium text-muted-foreground">Database</p>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/30">
                     Connected
                   </Badge>
-                  <span className="text-sm text-gray-500">SQLite</span>
+                  <span className="text-sm text-muted-foreground">SQLite</span>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500">Version</p>
+                <p className="text-sm font-medium text-muted-foreground">Version</p>
                 <p className="text-sm">1.0.0</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500">Environment</p>
+                <p className="text-sm font-medium text-muted-foreground">Environment</p>
                 <p className="text-sm">{process.env.NODE_ENV || 'development'}</p>
               </div>
             </div>
@@ -123,11 +123,11 @@ export default function SettingsPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500">Max File Size</p>
+                <p className="text-sm font-medium text-muted-foreground">Max File Size</p>
                 <p className="text-sm">100 MB</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-500">Allowed Types</p>
+                <p className="text-sm font-medium text-muted-foreground">Allowed Types</p>
                 <p className="text-sm">PDF, DOCX, DOC, TXT, CSV, RTF, XPT</p>
               </div>
             </div>
@@ -145,21 +145,21 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {templatesLoading ? (
-              <div className="animate-pulse h-10 bg-gray-100 rounded" />
+              <div className="animate-pulse h-10 bg-muted rounded" />
             ) : templates && templates.length > 0 ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-muted/40 rounded-lg">
                   <div className="flex items-center gap-3">
                     {defaultTemplate ? (
                       <>
-                        <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                        <Star className="h-5 w-5 text-warning fill-warning" />
                         <div>
                           <p className="font-medium">{defaultTemplate.name}</p>
-                          <p className="text-sm text-gray-500">Version {defaultTemplate.version}</p>
+                          <p className="text-sm text-muted-foreground">Version {defaultTemplate.version}</p>
                         </div>
                       </>
                     ) : (
-                      <p className="text-gray-500">No default template set</p>
+                      <p className="text-muted-foreground">No default template set</p>
                     )}
                   </div>
                   <Link href="/templates">
@@ -172,12 +172,12 @@ export default function SettingsPage() {
 
                 {!defaultTemplate && templates.length > 0 && (
                   <div className="border-t pt-4">
-                    <p className="text-sm text-gray-600 mb-3">Select a default template:</p>
+                    <p className="text-sm text-muted-foreground mb-3">Select a default template:</p>
                     <div className="space-y-2">
                       {templates.slice(0, 5).map((template) => (
                         <div
                           key={template.id}
-                          className="flex items-center justify-between p-2 hover:bg-gray-50 rounded"
+                          className="flex items-center justify-between p-2 hover:bg-muted/40 rounded"
                         >
                           <span className="text-sm">{template.name}</span>
                           <Button
@@ -196,7 +196,7 @@ export default function SettingsPage() {
               </div>
             ) : (
               <div className="text-center py-4">
-                <p className="text-gray-500 mb-3">No templates created yet</p>
+                <p className="text-muted-foreground mb-3">No templates created yet</p>
                 <Link href="/templates">
                   <Button>Create Template</Button>
                 </Link>
@@ -216,27 +216,27 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {rulesLoading ? (
-              <div className="animate-pulse h-10 bg-gray-100 rounded" />
+              <div className="animate-pulse h-10 bg-muted rounded" />
             ) : (
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="p-3 bg-gray-50 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-gray-900">{totalRulesCount}</p>
-                    <p className="text-sm text-gray-500">Total Rules</p>
+                  <div className="p-3 bg-muted/40 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-foreground">{totalRulesCount}</p>
+                    <p className="text-sm text-muted-foreground">Total Rules</p>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-green-700">{activeRulesCount}</p>
-                    <p className="text-sm text-green-600">Active</p>
+                  <div className="p-3 bg-success/10 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-success">{activeRulesCount}</p>
+                    <p className="text-sm text-success">Active</p>
                   </div>
-                  <div className="p-3 bg-gray-50 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-gray-400">{totalRulesCount - activeRulesCount}</p>
-                    <p className="text-sm text-gray-500">Inactive</p>
+                  <div className="p-3 bg-muted/40 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-muted-foreground/70">{totalRulesCount - activeRulesCount}</p>
+                    <p className="text-sm text-muted-foreground">Inactive</p>
                   </div>
                 </div>
 
                 {rules && rules.length > 0 && (
                   <div className="border-t pt-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Recent Rules</p>
+                    <p className="text-sm font-medium text-foreground/80 mb-2">Recent Rules</p>
                     <div className="space-y-1">
                       {rules.slice(0, 5).map((rule) => (
                         <div

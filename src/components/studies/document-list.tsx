@@ -105,10 +105,10 @@ export function DocumentList({ documents, slotId }: DocumentListProps) {
 
   if (sortedDocuments.length === 0) {
     return (
-      <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-        <FileQuestion className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-        <p className="text-gray-500 mb-1">No documents uploaded</p>
-        <p className="text-sm text-gray-400">
+      <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+        <FileQuestion className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+        <p className="text-muted-foreground mb-1">No documents uploaded</p>
+        <p className="text-sm text-muted-foreground/70">
           {slotId
             ? 'Upload a document to this section to get started'
             : 'Select a section and upload documents'}
@@ -120,7 +120,7 @@ export function DocumentList({ documents, slotId }: DocumentListProps) {
   return (
     <div className="space-y-2">
       {/* Document list header */}
-      <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider" aria-hidden="true">
+      <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider" aria-hidden="true">
         <div className="col-span-4">Filename</div>
         <div className="col-span-2">Version</div>
         <div className="col-span-2">Status</div>
@@ -129,7 +129,7 @@ export function DocumentList({ documents, slotId }: DocumentListProps) {
       </div>
 
       {/* Document list items */}
-      <div className="divide-y divide-gray-100" role="list" aria-label="Document list">
+      <div className="divide-y divide-border/60" role="list" aria-label="Document list">
         {sortedDocuments.map((document) => (
           <DocumentListItem
             key={document.id}
@@ -205,8 +205,8 @@ function DocumentListItem({ document, onView, onDelete }: DocumentListItemProps)
       role="listitem"
       className={cn(
         'grid grid-cols-12 gap-4 px-4 py-3 items-center',
-        'hover:bg-gray-50 transition-colors rounded-md group',
-        isFailed && 'bg-red-50/50'
+        'hover:bg-muted/40 transition-colors rounded-md group',
+        isFailed && 'bg-destructive/10'
       )}
     >
       {/* Filename */}
@@ -214,18 +214,18 @@ function DocumentListItem({ document, onView, onDelete }: DocumentListItemProps)
         {isProcessing ? (
           <Loader2 className="h-4 w-4 flex-shrink-0 text-amber-500 animate-spin" />
         ) : isFailed ? (
-          <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-500" />
+          <AlertCircle className="h-4 w-4 flex-shrink-0 text-destructive" />
         ) : (
-          <FileText className="h-4 w-4 flex-shrink-0 text-gray-400" />
+          <FileText className="h-4 w-4 flex-shrink-0 text-muted-foreground/70" />
         )}
-        <span className="text-sm font-medium text-gray-900 truncate" title={document.sourceFileName}>
+        <span className="text-sm font-medium text-foreground truncate" title={document.sourceFileName}>
           {document.sourceFileName}
         </span>
       </div>
 
       {/* Version */}
       <div className="col-span-4 sm:col-span-2">
-        <span className="text-sm text-gray-600">v{document.version}</span>
+        <span className="text-sm text-muted-foreground">v{document.version}</span>
       </div>
 
       {/* Status */}
@@ -235,13 +235,13 @@ function DocumentListItem({ document, onView, onDelete }: DocumentListItemProps)
           {/* Show processing progress */}
           {isProcessing && (
             <div className="flex items-center gap-2">
-              <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden max-w-[80px]">
+              <div className="flex-1 h-1.5 bg-muted/60 rounded-full overflow-hidden max-w-[80px]">
                 <div
                   className="h-full bg-amber-500 transition-all duration-300"
                   style={{ width: `${currentProgress}%` }}
                 />
               </div>
-              <span className="text-xs text-gray-500">{currentProgress}%</span>
+              <span className="text-xs text-muted-foreground">{currentProgress}%</span>
             </div>
           )}
         </div>
@@ -249,14 +249,14 @@ function DocumentListItem({ document, onView, onDelete }: DocumentListItemProps)
 
       {/* File Size */}
       <div className="col-span-4 sm:col-span-2">
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-muted-foreground">
           {formatBytes(document.fileSize)}
         </span>
       </div>
 
       {/* Upload Date */}
       <div className="col-span-8 sm:col-span-2 flex items-center justify-between">
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-muted-foreground">
           {formatDate(document.createdAt)}
         </span>
 
@@ -269,17 +269,17 @@ function DocumentListItem({ document, onView, onDelete }: DocumentListItemProps)
             onClick={() => onView(document)}
             aria-label={`View ${document.sourceFileName}`}
           >
-            <Eye className="h-4 w-4 text-gray-500" />
+            <Eye className="h-4 w-4 text-muted-foreground" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 hover:text-red-600"
+            className="h-8 w-8 hover:text-destructive"
             onClick={() => onDelete(document)}
             aria-label={`Delete ${document.sourceFileName}`}
             disabled={isProcessing}
           >
-            <Trash2 className="h-4 w-4 text-gray-500" />
+            <Trash2 className="h-4 w-4 text-muted-foreground" />
           </Button>
         </div>
       </div>

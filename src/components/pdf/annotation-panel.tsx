@@ -185,10 +185,10 @@ export function AnnotationPanel({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <MessageSquare className="h-4 w-4 text-gray-500" />
-          <h2 className="font-semibold text-sm text-gray-700">Annotations</h2>
+          <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          <h2 className="font-semibold text-sm text-foreground/80">Annotations</h2>
           {annotations && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground/70">
               ({stats.open} open, {stats.resolved} resolved)
             </span>
           )}
@@ -265,15 +265,15 @@ export function AnnotationPanel({
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/70" />
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <Card className="border-red-200 bg-red-50">
+          <Card className="border-destructive/30 bg-destructive/10">
             <CardContent className="py-4">
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-destructive">
                 Failed to load annotations: {error.message}
               </p>
             </CardContent>
@@ -283,9 +283,9 @@ export function AnnotationPanel({
         {/* Empty State */}
         {!isLoading && !error && filteredAnnotations.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <MessageSquare className="h-12 w-12 text-gray-300 mb-3" />
-            <p className="text-sm text-gray-500 mb-1">No annotations</p>
-            <p className="text-xs text-gray-400">
+            <MessageSquare className="h-12 w-12 text-muted-foreground/50 mb-3" />
+            <p className="text-sm text-muted-foreground mb-1">No annotations</p>
+            <p className="text-xs text-muted-foreground/70">
               {annotations && annotations.length > 0
                 ? 'No annotations match the current filters'
                 : 'Add an annotation to get started'}

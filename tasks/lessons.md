@@ -18,4 +18,9 @@ Patterns and rules discovered through corrections. Review at session start.
 
 ---
 
+## UI Theming
+
+- **Semantic tokens**: Prefer `bg-*`/`text-*` semantic tokens over hardcoded colors to keep dark mode consistent.
+- **Design system alignment**: Centralize palette, radius, and shadows in `globals.css` so shared UI primitives stay consistent.
+
 *Add new lessons below as corrections occur*

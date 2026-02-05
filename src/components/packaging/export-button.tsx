@@ -113,7 +113,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
           <p
             className={cn(
               'text-xs text-center',
-              isReady ? 'text-green-600' : 'text-yellow-600'
+              isReady ? 'text-success' : 'text-warning'
             )}
           >
             {isReady
@@ -124,7 +124,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
 
         {/* Export error */}
         {exportPackage.isError && (
-          <p className="text-xs text-center text-red-600">
+          <p className="text-xs text-center text-destructive">
             {exportPackage.error instanceof Error
               ? exportPackage.error.message
               : 'Export failed'}
@@ -137,7 +137,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              <AlertTriangle className="h-5 w-5 text-warning" />
               Package Not Ready
             </DialogTitle>
             <DialogDescription className="text-left">
@@ -148,10 +148,10 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
           <div className="py-4">
             {/* List issues */}
             {readinessData && (
-              <ul className="text-sm text-gray-600 space-y-2">
+              <ul className="text-sm text-muted-foreground space-y-2">
                 {readinessData.readiness.missingRequired.length > 0 && (
                   <li className="flex items-start gap-2">
-                    <span className="text-red-500 mt-0.5">*</span>
+                    <span className="text-destructive mt-0.5">*</span>
                     <span>
                       {readinessData.readiness.missingRequired.length} required{' '}
                       {readinessData.readiness.missingRequired.length === 1
@@ -163,7 +163,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
                 )}
                 {readinessData.readiness.validationErrors > 0 && (
                   <li className="flex items-start gap-2">
-                    <span className="text-red-500 mt-0.5">*</span>
+                    <span className="text-destructive mt-0.5">*</span>
                     <span>
                       {readinessData.readiness.validationErrors} validation{' '}
                       {readinessData.readiness.validationErrors === 1
@@ -175,7 +175,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
                 )}
                 {readinessData.readiness.unresolvedAnnotations > 0 && (
                   <li className="flex items-start gap-2">
-                    <span className="text-red-500 mt-0.5">*</span>
+                    <span className="text-destructive mt-0.5">*</span>
                     <span>
                       {readinessData.readiness.unresolvedAnnotations} unresolved{' '}
                       {readinessData.readiness.unresolvedAnnotations === 1
@@ -188,7 +188,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
             )}
 
             {/* Force export checkbox */}
-            <div className="mt-6 pt-4 border-t border-gray-200">
+            <div className="mt-6 pt-4 border-t border-border">
               <label className="flex items-start gap-3 cursor-pointer">
                 <Checkbox
                   checked={forceExport}
@@ -196,10 +196,10 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
                   className="mt-0.5"
                 />
                 <div className="text-sm">
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-foreground">
                     Export anyway
                   </span>
-                  <p className="text-gray-500 mt-0.5">
+                  <p className="text-muted-foreground mt-0.5">
                     I understand the package may be incomplete or have issues.
                     Only approved and published documents will be included.
                   </p>
@@ -246,18 +246,18 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
               {lastExportResult?.validation ? (
                 lastExportResult.validation.errorCount === 0 ? (
                   <>
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <CheckCircle className="h-5 w-5 text-success" />
                     Export Successful
                   </>
                 ) : (
                   <>
-                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                    <AlertTriangle className="h-5 w-5 text-warning" />
                     Export Complete with Issues
                   </>
                 )
               ) : (
                 <>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                   Export Successful
                 </>
               )}
@@ -265,7 +265,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
             <DialogDescription className="text-left">
               {lastExportResult && (
                 <span className="flex items-center gap-2 mt-1">
-                  Package ID: <code className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">{lastExportResult.packageId.slice(0, 8)}...</code>
+                  Package ID: <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{lastExportResult.packageId.slice(0, 8)}...</code>
                   {lastExportResult.validation && (
                     <>
                       {lastExportResult.validation.errorCount > 0 && (

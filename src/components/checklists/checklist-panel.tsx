@@ -78,14 +78,14 @@ export function ChecklistPanel({ documentId }: ChecklistPanelProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/70" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center gap-2 text-sm text-red-600 py-4">
+      <div className="flex items-center gap-2 text-sm text-destructive py-4">
         <AlertCircle className="h-4 w-4" />
         Failed to load checklist: {error.message}
       </div>
@@ -94,7 +94,7 @@ export function ChecklistPanel({ documentId }: ChecklistPanelProps) {
 
   if (!checklistResponse) {
     return (
-      <div className="text-sm text-gray-500 py-4">
+      <div className="text-sm text-muted-foreground py-4">
         No checklist has been initialized for this document.
       </div>
     );
@@ -179,8 +179,8 @@ export function ChecklistPanel({ documentId }: ChecklistPanelProps) {
       {/* Header with checklist name and completion status */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ClipboardCheck className="h-4 w-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">{checklist.name}</span>
+          <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground/80">{checklist.name}</span>
         </div>
         {isCompleted && (
           <Badge variant="success" className="gap-1">
@@ -192,21 +192,21 @@ export function ChecklistPanel({ documentId }: ChecklistPanelProps) {
 
       {/* Completion info */}
       {isCompleted && checklistResponse.completedAt && (
-        <div className="text-xs text-gray-500 bg-green-50 p-2 rounded-md">
+        <div className="text-xs text-muted-foreground bg-success/10 p-2 rounded-md">
           Completed on {formatDate(checklistResponse.completedAt)}
         </div>
       )}
 
       {/* Progress indicator */}
       <div className="space-y-1">
-        <div className="flex items-center justify-between text-xs text-gray-600">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Progress</span>
           <span>
             {answeredItems} of {totalItems} items
           </span>
         </div>
         <div
-          className="h-2 bg-gray-200 rounded-full overflow-hidden"
+          className="h-2 bg-muted/60 rounded-full overflow-hidden"
           role="progressbar"
           aria-valuenow={answeredItems}
           aria-valuemin={0}
@@ -215,7 +215,7 @@ export function ChecklistPanel({ documentId }: ChecklistPanelProps) {
           <div
             className={cn(
               'h-full transition-all duration-300',
-              answeredItems === totalItems ? 'bg-green-500' : 'bg-blue-500'
+              answeredItems === totalItems ? 'bg-success' : 'bg-primary'
             )}
             style={{ width: `${totalItems > 0 ? (answeredItems / totalItems) * 100 : 0}%` }}
           />
@@ -226,7 +226,7 @@ export function ChecklistPanel({ documentId }: ChecklistPanelProps) {
       <div className="space-y-4">
         {sortedCategories.map((category) => (
           <div key={category} className="space-y-2">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               {category}
             </h4>
             <div className="space-y-2">
@@ -248,7 +248,7 @@ export function ChecklistPanel({ documentId }: ChecklistPanelProps) {
 
       {/* Action buttons */}
       {!isCompleted && (
-        <div className="flex gap-2 pt-2 border-t border-gray-200">
+        <div className="flex gap-2 pt-2 border-t border-border">
           <Button
             variant="outline"
             size="sm"

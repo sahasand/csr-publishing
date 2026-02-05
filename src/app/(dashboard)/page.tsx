@@ -76,7 +76,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
       </div>
     );
   }
@@ -84,18 +84,18 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Clinical Study Report Publishing</p>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Clinical Study Report Publishing</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Active Studies
             </CardTitle>
-            <FileText className="h-4 w-4 text-gray-500" />
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeStudies.length}</div>
@@ -104,10 +104,10 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Templates
             </CardTitle>
-            <FolderTree className="h-4 w-4 text-gray-500" />
+            <FolderTree className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{templates.length}</div>
@@ -116,10 +116,10 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Documents
             </CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
+            <CheckCircle className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalDocuments}</div>
@@ -128,10 +128,10 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Pending Review
             </CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-500" />
+            <AlertCircle className="h-4 w-4 text-warning" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
@@ -150,20 +150,20 @@ export default function DashboardPage() {
             {/* Step 1: Template */}
             <div className={`relative p-4 rounded-lg border-2 ${
               nextStep === 'template'
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-primary bg-primary/10'
                 : workflowState.hasTemplates
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-gray-200'
+                  ? 'border-success/30 bg-success/10'
+                  : 'border-border'
             }`}>
               <div className="flex items-center gap-2 mb-2">
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  workflowState.hasTemplates ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                  workflowState.hasTemplates ? 'bg-success text-white' : 'bg-muted/60 text-muted-foreground'
                 }`}>
                   {workflowState.hasTemplates ? '✓' : '1'}
                 </div>
                 <span className="font-medium">Create Template</span>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-muted-foreground mb-3">
                 Define the eCTD document structure with sections and requirements
               </p>
               {nextStep === 'template' && (
@@ -182,20 +182,20 @@ export default function DashboardPage() {
             {/* Step 2: Study */}
             <div className={`relative p-4 rounded-lg border-2 ${
               nextStep === 'study'
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-primary bg-primary/10'
                 : workflowState.hasStudies
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-gray-200'
+                  ? 'border-success/30 bg-success/10'
+                  : 'border-border'
             }`}>
               <div className="flex items-center gap-2 mb-2">
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  workflowState.hasStudies ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                  workflowState.hasStudies ? 'bg-success text-white' : 'bg-muted/60 text-muted-foreground'
                 }`}>
                   {workflowState.hasStudies ? '✓' : '2'}
                 </div>
                 <span className="font-medium">Create Study</span>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-muted-foreground mb-3">
                 Set up your clinical study with protocol number and sponsor info
               </p>
               {nextStep === 'study' && (
@@ -214,20 +214,20 @@ export default function DashboardPage() {
             {/* Step 3: Upload */}
             <div className={`relative p-4 rounded-lg border-2 ${
               nextStep === 'upload'
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-primary bg-primary/10'
                 : workflowState.hasDocuments
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-gray-200'
+                  ? 'border-success/30 bg-success/10'
+                  : 'border-border'
             }`}>
               <div className="flex items-center gap-2 mb-2">
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  workflowState.hasDocuments ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                  workflowState.hasDocuments ? 'bg-success text-white' : 'bg-muted/60 text-muted-foreground'
                 }`}>
                   {workflowState.hasDocuments ? '✓' : '3'}
                 </div>
                 <span className="font-medium">Upload Documents</span>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-muted-foreground mb-3">
                 Upload PDFs to each section, validate, and review
               </p>
               {nextStep === 'upload' && activeStudies.length > 0 && (
@@ -246,16 +246,16 @@ export default function DashboardPage() {
             {/* Step 4: Export */}
             <div className={`relative p-4 rounded-lg border-2 ${
               nextStep === 'review'
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200'
+                ? 'border-primary bg-primary/10'
+                : 'border-border'
             }`}>
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-gray-200 text-gray-600">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-muted/60 text-muted-foreground">
                   4
                 </div>
                 <span className="font-medium">Export Package</span>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-muted-foreground mb-3">
                 Generate eCTD-compliant ZIP package for submission
               </p>
               {nextStep === 'review' && activeStudies.length > 0 && (
@@ -291,17 +291,17 @@ export default function DashboardPage() {
                   <Link
                     key={study.id}
                     href={`/studies/${study.id}`}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/40 transition-colors"
                   >
                     <div>
-                      <p className="font-medium text-gray-900">{study.studyId}</p>
-                      <p className="text-sm text-gray-500">{study.sponsor}</p>
+                      <p className="font-medium text-foreground">{study.studyId}</p>
+                      <p className="text-sm text-muted-foreground">{study.sponsor}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={study.status === 'ACTIVE' ? 'success' : 'secondary'}>
                         {study.status}
                       </Badge>
-                      <span className="text-sm text-gray-400">
+                      <span className="text-sm text-muted-foreground/70">
                         {study._count?.documents || 0} docs
                       </span>
                     </div>
@@ -309,8 +309,8 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
                 <p>No studies yet</p>
                 <Link href="/studies">
                   <Button variant="outline" size="sm" className="mt-2">
@@ -340,11 +340,11 @@ export default function DashboardPage() {
                   <Link
                     key={template.id}
                     href={`/templates/${template.id}`}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/40 transition-colors"
                   >
                     <div className="flex items-center gap-2">
-                      <FolderTree className="h-4 w-4 text-gray-400" />
-                      <p className="font-medium text-gray-900">{template.name}</p>
+                      <FolderTree className="h-4 w-4 text-muted-foreground/70" />
+                      <p className="font-medium text-foreground">{template.name}</p>
                     </div>
                     {template.isDefault && (
                       <Badge variant="outline">Default</Badge>
@@ -353,8 +353,8 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <FolderTree className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <FolderTree className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
                 <p>No templates yet</p>
                 <Link href="/templates">
                   <Button variant="outline" size="sm" className="mt-2">

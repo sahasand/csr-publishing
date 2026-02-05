@@ -20,22 +20,22 @@ export default function Error({
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="max-w-md w-full space-y-6 text-center">
         <div className="flex justify-center">
-          <div className="rounded-full bg-red-100 p-4">
-            <AlertTriangle className="h-8 w-8 text-red-600" />
+          <div className="rounded-full bg-destructive/10 p-4">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
           </div>
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Something went wrong
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             An unexpected error occurred. Please try again or return to the dashboard.
           </p>
         </div>
 
         {process.env.NODE_ENV === 'development' && (
-          <pre className="text-left text-xs bg-gray-100 p-4 rounded-lg overflow-auto max-h-40">
+          <pre className="text-left text-xs bg-muted/60 p-4 rounded-lg overflow-auto max-h-40 text-foreground/80">
             {error.message}
             {error.digest && `\n\nDigest: ${error.digest}`}
           </pre>

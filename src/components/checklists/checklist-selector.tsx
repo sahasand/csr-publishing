@@ -33,8 +33,8 @@ export function ChecklistSelector({
   if (currentChecklistName) {
     return (
       <div className="flex items-center gap-2">
-        <ClipboardList className="h-4 w-4 text-gray-500" />
-        <span className="text-sm text-gray-600">Current checklist:</span>
+        <ClipboardList className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">Current checklist:</span>
         <Badge variant="secondary">{currentChecklistName}</Badge>
       </div>
     );
@@ -42,7 +42,7 @@ export function ChecklistSelector({
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading checklists...
       </div>
@@ -51,7 +51,7 @@ export function ChecklistSelector({
 
   if (error) {
     return (
-      <div className="text-sm text-red-600">
+      <div className="text-sm text-destructive">
         Failed to load checklists: {error.message}
       </div>
     );
@@ -59,7 +59,7 @@ export function ChecklistSelector({
 
   if (!checklists || checklists.length === 0) {
     return (
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-muted-foreground">
         No checklists available. Create one in the admin panel.
       </div>
     );
@@ -74,7 +74,7 @@ export function ChecklistSelector({
   return (
     <div className="space-y-3">
       <div className="space-y-1.5">
-        <label htmlFor="checklist-select" className="text-xs text-gray-500">
+        <label htmlFor="checklist-select" className="text-xs text-muted-foreground">
           Select Checklist
         </label>
         <Select

@@ -366,11 +366,11 @@ export function DocumentUpload({
         className={cn(
           'relative border-2 border-dashed rounded-lg p-6 transition-colors',
           'flex flex-col items-center justify-center gap-3 min-h-[160px]',
-          isDragOver && !disabled && 'border-blue-500 bg-blue-50',
-          !isDragOver && !disabled && 'border-gray-300 hover:border-gray-400 bg-gray-50',
-          disabled && 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60',
-          uploadState.status === 'error' && 'border-red-300 bg-red-50',
-          uploadState.status === 'success' && 'border-green-300 bg-green-50'
+          isDragOver && !disabled && 'border-primary bg-primary/10',
+          !isDragOver && !disabled && 'border-border hover:border-border/70 bg-muted/40',
+          disabled && 'border-border bg-muted cursor-not-allowed opacity-60',
+          uploadState.status === 'error' && 'border-destructive/40 bg-destructive/10',
+          uploadState.status === 'success' && 'border-success/40 bg-success/10'
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -383,29 +383,29 @@ export function DocumentUpload({
             <div
               className={cn(
                 'p-3 rounded-full',
-                isDragOver ? 'bg-blue-100' : 'bg-gray-100'
+                isDragOver ? 'bg-primary/10' : 'bg-muted'
               )}
             >
               <Upload
                 className={cn(
                   'h-6 w-6',
-                  isDragOver ? 'text-blue-500' : 'text-gray-400'
+                  isDragOver ? 'text-primary' : 'text-muted-foreground/70'
                 )}
               />
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 <span className="font-medium">Drop a file here</span> or{' '}
                 <button
                   type="button"
                   onClick={handleBrowseClick}
                   disabled={isDisabled}
-                  className="text-blue-600 hover:text-blue-700 font-medium focus:outline-none focus:underline disabled:opacity-50"
+                  className="text-primary hover:text-primary font-medium focus:outline-none focus:underline disabled:opacity-50"
                 >
                   browse
                 </button>
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 PDF, Word, RTF, CSV, TXT, XPT up to {formatBytes(MAX_FILE_SIZE)}
               </p>
             </div>
@@ -415,10 +415,10 @@ export function DocumentUpload({
         {/* Validating state */}
         {uploadState.status === 'validating' && (
           <>
-            <div className="p-3 rounded-full bg-gray-100 animate-pulse">
-              <FileText className="h-6 w-6 text-gray-400" />
+            <div className="p-3 rounded-full bg-muted animate-pulse">
+              <FileText className="h-6 w-6 text-muted-foreground/70" />
             </div>
-            <p className="text-sm text-gray-600">Validating file...</p>
+            <p className="text-sm text-muted-foreground">Validating file...</p>
           </>
         )}
 
@@ -427,17 +427,17 @@ export function DocumentUpload({
           <>
             <div className="w-full max-w-xs">
               <div className="flex items-center gap-2 mb-2">
-                <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                <span className="text-sm text-gray-700 truncate">
+                <FileText className="h-4 w-4 text-primary flex-shrink-0" />
+                <span className="text-sm text-foreground/80 truncate">
                   {uploadState.file.name}
                 </span>
-                <span className="text-xs text-gray-500 flex-shrink-0">
+                <span className="text-xs text-muted-foreground flex-shrink-0">
                   {formatBytes(uploadState.file.size)}
                 </span>
               </div>
               {/* Progress bar */}
               <div
-                className="w-full bg-gray-200 rounded-full h-2 overflow-hidden"
+                className="w-full bg-muted/60 rounded-full h-2 overflow-hidden"
                 role="progressbar"
                 aria-valuenow={uploadState.progress}
                 aria-valuemin={0}
@@ -445,18 +445,18 @@ export function DocumentUpload({
                 aria-label={`Upload progress: ${uploadState.progress}%`}
               >
                 <div
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-300 ease-out"
+                  className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${uploadState.progress}%` }}
                 />
               </div>
               <div className="flex justify-between mt-1">
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   {uploadState.progress}% uploaded
                 </span>
                 <button
                   type="button"
                   onClick={handleCancelClick}
-                  className="text-xs text-gray-500 hover:text-gray-700 focus:outline-none"
+                  className="text-xs text-muted-foreground hover:text-foreground/80 focus:outline-none"
                 >
                   Cancel
                 </button>
@@ -468,14 +468,14 @@ export function DocumentUpload({
         {/* Success state */}
         {uploadState.status === 'success' && uploadState.file && (
           <>
-            <div className="p-3 rounded-full bg-green-100">
-              <CheckCircle className="h-6 w-6 text-green-500" />
+            <div className="p-3 rounded-full bg-success/10">
+              <CheckCircle className="h-6 w-6 text-success" />
             </div>
             <div className="text-center">
-              <p className="text-sm text-green-700 font-medium">
+              <p className="text-sm text-success font-medium">
                 Upload complete!
               </p>
-              <p className="text-xs text-green-600 mt-1">
+              <p className="text-xs text-success mt-1">
                 {uploadState.file.name}
               </p>
             </div>
@@ -485,12 +485,12 @@ export function DocumentUpload({
         {/* Error state */}
         {uploadState.status === 'error' && (
           <>
-            <div className="p-3 rounded-full bg-red-100">
-              <AlertCircle className="h-6 w-6 text-red-500" />
+            <div className="p-3 rounded-full bg-destructive/10">
+              <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
             <div className="text-center">
-              <p className="text-sm text-red-700 font-medium">Upload failed</p>
-              <p className="text-xs text-red-600 mt-1 max-w-xs">
+              <p className="text-sm text-destructive font-medium">Upload failed</p>
+              <p className="text-xs text-destructive mt-1 max-w-xs">
                 {uploadState.error}
               </p>
             </div>

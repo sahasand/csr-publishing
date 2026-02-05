@@ -71,21 +71,21 @@ export function ChecklistItemRow({
 
   const resultButtonStyles = {
     pass: {
-      active: 'bg-green-500 text-white border-green-500 hover:bg-green-600',
-      inactive: 'bg-white text-green-600 border-green-300 hover:bg-green-50',
+      active: 'bg-success text-white border-success/50 hover:bg-success/90',
+      inactive: 'bg-background text-success border-success/40 hover:bg-success/10',
     },
     fail: {
-      active: 'bg-red-500 text-white border-red-500 hover:bg-red-600',
-      inactive: 'bg-white text-red-600 border-red-300 hover:bg-red-50',
+      active: 'bg-destructive text-white border-destructive/50 hover:bg-destructive/90',
+      inactive: 'bg-background text-destructive border-destructive/40 hover:bg-destructive/10',
     },
     na: {
-      active: 'bg-gray-500 text-white border-gray-500 hover:bg-gray-600',
-      inactive: 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50',
+      active: 'bg-muted text-foreground border-border/70 hover:bg-muted/80',
+      inactive: 'bg-background text-muted-foreground border-border hover:bg-muted/40',
     },
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-3 space-y-2">
+    <div className="border border-border rounded-lg p-3 space-y-2">
       {/* Header row with badges */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap">
@@ -93,7 +93,7 @@ export function ChecklistItemRow({
             {item.category}
           </Badge>
           {item.required && (
-            <span className="text-red-500 text-sm font-medium" title="Required">
+            <span className="text-destructive text-sm font-medium" title="Required">
               *
             </span>
           )}
@@ -107,7 +107,7 @@ export function ChecklistItemRow({
       </div>
 
       {/* Item text */}
-      <p className="text-sm text-gray-800">{item.text}</p>
+      <p className="text-sm text-foreground">{item.text}</p>
 
       {/* Button group and notes toggle */}
       <div className="flex items-center justify-between gap-2">
@@ -161,7 +161,7 @@ export function ChecklistItemRow({
         <button
           type="button"
           onClick={() => setIsNotesExpanded(!isNotesExpanded)}
-          className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground/80 transition-colors"
         >
           {isNotesExpanded ? (
             <ChevronDown className="h-3 w-3" />
@@ -169,7 +169,7 @@ export function ChecklistItemRow({
             <ChevronRight className="h-3 w-3" />
           )}
           Notes
-          {notes && <span className="text-gray-400">(1)</span>}
+          {notes && <span className="text-muted-foreground/70">(1)</span>}
         </button>
       </div>
 
@@ -181,7 +181,7 @@ export function ChecklistItemRow({
             onChange={(e) => handleNotesChange(e.target.value)}
             onBlur={handleNotesBlur}
             placeholder="Add notes about this item..."
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md resize-none focus:outline-none focus:ring-1 focus:ring-gray-400"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
             rows={2}
           />
         </div>

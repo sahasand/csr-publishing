@@ -86,7 +86,7 @@ function DialogContent({ children, className, ...props }: DialogContentProps) {
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50"
+        className="fixed inset-0 bg-foreground/20"
         onClick={() => onOpenChange(false)}
         aria-hidden="true"
       />
@@ -95,7 +95,7 @@ function DialogContent({ children, className, ...props }: DialogContentProps) {
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <div
           className={cn(
-            'relative bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[85vh] overflow-auto',
+            'relative bg-card text-card-foreground rounded-2xl shadow-card w-full max-w-lg max-h-[85vh] overflow-auto',
             className
           )}
           role="dialog"
@@ -106,7 +106,7 @@ function DialogContent({ children, className, ...props }: DialogContentProps) {
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2"
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -167,7 +167,7 @@ function DialogDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn('text-sm text-gray-500', className)}
+      className={cn('text-sm text-muted-foreground', className)}
       {...props}
     />
   );

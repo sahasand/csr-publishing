@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'destructive' | 'outline' | 'ghost' | 'link';
+  variant?: 'default' | 'destructive' | 'outline' | 'ghost' | 'link' | 'secondary';
   size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
@@ -12,22 +12,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
-          'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50',
+          'inline-flex items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50',
           {
-            'bg-gray-900 text-gray-50 shadow hover:bg-gray-900/90':
+            'bg-primary text-primary-foreground shadow-glow hover:bg-primary/90':
               variant === 'default',
-            'bg-red-500 text-gray-50 shadow-sm hover:bg-red-500/90':
+            'bg-destructive text-white shadow-sm hover:bg-destructive/90':
               variant === 'destructive',
-            'border border-gray-200 bg-white shadow-sm hover:bg-gray-100 hover:text-gray-900':
+            'border border-border bg-background shadow-sm hover:bg-muted':
               variant === 'outline',
-            'hover:bg-gray-100 hover:text-gray-900': variant === 'ghost',
-            'text-gray-900 underline-offset-4 hover:underline':
+            'bg-secondary text-foreground hover:bg-secondary/80':
+              variant === 'secondary',
+            'hover:bg-muted': variant === 'ghost',
+            'text-primary underline-offset-4 hover:underline':
               variant === 'link',
           },
           {
             'h-9 px-4 py-2': size === 'default',
-            'h-8 rounded-md px-3 text-xs': size === 'sm',
-            'h-10 rounded-md px-8': size === 'lg',
+            'h-8 rounded-[var(--radius-md)] px-3 text-xs': size === 'sm',
+            'h-10 rounded-[var(--radius-md)] px-8': size === 'lg',
             'h-9 w-9': size === 'icon',
           },
           className

@@ -27,8 +27,8 @@ export function PackageStatus({ result, onDownload, showValidation = true }: Pac
   // Determine overall status based on validation
   const hasValidationErrors = result.validation && result.validation.errorCount > 0;
   const cardBorderColor = hasValidationErrors
-    ? 'border-yellow-200 bg-yellow-50/30'
-    : 'border-green-200 bg-green-50/30';
+    ? 'border-warning/30 bg-warning/10'
+    : 'border-success/30 bg-success/10';
 
   return (
     <div className="space-y-4">
@@ -37,9 +37,9 @@ export function PackageStatus({ result, onDownload, showValidation = true }: Pac
           <CardTitle className="text-sm flex items-center justify-between">
             <div className="flex items-center gap-2">
               {hasValidationErrors ? (
-                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                <AlertTriangle className="h-4 w-4 text-warning" />
               ) : (
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-4 w-4 text-success" />
               )}
               Package Ready
             </div>
@@ -55,36 +55,36 @@ export function PackageStatus({ result, onDownload, showValidation = true }: Pac
           <dl className="space-y-3 text-sm">
             {/* Package ID */}
             <div className="flex items-center justify-between">
-              <dt className="text-gray-500 flex items-center gap-1.5">
+              <dt className="text-muted-foreground flex items-center gap-1.5">
                 <Package className="h-3.5 w-3.5" />
                 Package ID
               </dt>
-              <dd className="font-mono text-xs text-gray-700 truncate max-w-[180px]" title={result.packageId}>
+              <dd className="font-mono text-xs text-foreground/80 truncate max-w-[180px]" title={result.packageId}>
                 {result.packageId.slice(0, 8)}...
               </dd>
             </div>
 
             {/* Study Number */}
             <div className="flex items-center justify-between">
-              <dt className="text-gray-500">Study</dt>
-              <dd className="font-medium text-gray-700">{result.studyNumber}</dd>
+              <dt className="text-muted-foreground">Study</dt>
+              <dd className="font-medium text-foreground/80">{result.studyNumber}</dd>
             </div>
 
             {/* File Count */}
             <div className="flex items-center justify-between">
-              <dt className="text-gray-500 flex items-center gap-1.5">
+              <dt className="text-muted-foreground flex items-center gap-1.5">
                 <FileText className="h-3.5 w-3.5" />
                 Files Included
               </dt>
-              <dd className="font-medium text-gray-700">
+              <dd className="font-medium text-foreground/80">
                 {result.fileCount} {result.fileCount === 1 ? 'file' : 'files'}
               </dd>
             </div>
 
             {/* ZIP Size */}
             <div className="flex items-center justify-between">
-              <dt className="text-gray-500">Package Size</dt>
-              <dd className="font-medium text-gray-700">
+              <dt className="text-muted-foreground">Package Size</dt>
+              <dd className="font-medium text-foreground/80">
                 {formatBytes(result.zipSize)}
               </dd>
             </div>
@@ -92,10 +92,10 @@ export function PackageStatus({ result, onDownload, showValidation = true }: Pac
             {/* Quick validation summary if present */}
             {result.validation && (
               <div className="flex items-center justify-between">
-                <dt className="text-gray-500">Validation</dt>
+                <dt className="text-muted-foreground">Validation</dt>
                 <dd className="flex items-center gap-2">
                   {result.validation.errorCount === 0 && result.validation.warningCount === 0 ? (
-                    <span className="text-green-600 font-medium text-xs">All Passed</span>
+                    <span className="text-success font-medium text-xs">All Passed</span>
                   ) : (
                     <>
                       {result.validation.errorCount > 0 && (
@@ -116,7 +116,7 @@ export function PackageStatus({ result, onDownload, showValidation = true }: Pac
           </dl>
 
           {/* Download Button */}
-          <div className={cn("mt-4 pt-4 border-t", hasValidationErrors ? "border-yellow-200" : "border-green-200")}>
+          <div className={cn("mt-4 pt-4 border-t", hasValidationErrors ? "border-warning/30" : "border-success/30")}>
             <Button
               className="w-full"
               onClick={handleDownload}
@@ -124,7 +124,7 @@ export function PackageStatus({ result, onDownload, showValidation = true }: Pac
               <Download className="h-4 w-4 mr-2" />
               Download Package
             </Button>
-            <p className="text-xs text-gray-500 text-center mt-2">
+            <p className="text-xs text-muted-foreground text-center mt-2">
               {hasValidationErrors
                 ? 'Package exported with validation issues'
                 : 'ZIP archive ready for submission'}

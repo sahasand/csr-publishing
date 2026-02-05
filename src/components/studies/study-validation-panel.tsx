@@ -50,13 +50,13 @@ export function StudyValidationPanel({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Shield className="h-4 w-4 text-gray-400" />
+            <Shield className="h-4 w-4 text-muted-foreground/70" />
             Study Validation
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-4">
-            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground/70" />
           </div>
         </CardContent>
       </Card>
@@ -68,12 +68,12 @@ export function StudyValidationPanel({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Shield className="h-4 w-4 text-gray-400" />
+            <Shield className="h-4 w-4 text-muted-foreground/70" />
             Study Validation
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-red-500">Failed to load validation data</p>
+          <p className="text-sm text-destructive">Failed to load validation data</p>
         </CardContent>
       </Card>
     );
@@ -84,12 +84,12 @@ export function StudyValidationPanel({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Shield className="h-4 w-4 text-gray-400" />
+            <Shield className="h-4 w-4 text-muted-foreground/70" />
             Study Validation
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500">No validation data available</p>
+          <p className="text-sm text-muted-foreground">No validation data available</p>
         </CardContent>
       </Card>
     );
@@ -126,7 +126,7 @@ export function StudyValidationPanel({
             aria-controls="study-validation-content"
           >
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-gray-400" />
+              <Shield className="h-4 w-4 text-muted-foreground/70" />
               Study Validation
             </div>
             <div className="flex items-center gap-2">
@@ -149,9 +149,9 @@ export function StudyValidationPanel({
                 </Badge>
               )}
               {isExpanded ? (
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground/70" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-gray-400" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground/70" />
               )}
             </div>
           </button>
@@ -168,7 +168,7 @@ export function StudyValidationPanel({
             {documents.length > 0 ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-medium text-gray-700">
+                  <h4 className="text-xs font-medium text-foreground/80">
                     {showAllDocuments
                       ? 'All Documents'
                       : documentsWithIssues.length > 0
@@ -178,7 +178,7 @@ export function StudyValidationPanel({
                   {documents.length > 5 && (
                     <button
                       type="button"
-                      className="text-xs text-blue-600 hover:text-blue-800"
+                      className="text-xs text-primary hover:text-primary"
                       onClick={() => setShowAllDocuments(!showAllDocuments)}
                     >
                       {showAllDocuments
@@ -202,7 +202,7 @@ export function StudyValidationPanel({
                       />
                     ))
                   ) : (
-                    <p className="text-xs text-gray-500 py-2">
+                    <p className="text-xs text-muted-foreground py-2">
                       No documents with issues
                     </p>
                   )}
@@ -210,22 +210,22 @@ export function StudyValidationPanel({
 
                 {/* Show more indicator */}
                 {!showAllDocuments && documentsWithIssues.length > 5 && (
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-muted-foreground text-center">
                     +{documentsWithIssues.length - 5} more with issues
                   </p>
                 )}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 No documents have been validated yet
               </p>
             )}
 
             {/* Status message */}
             {allValid && summary.validatedDocuments > 0 && (
-              <div className="flex items-start gap-2 p-2 bg-green-50 rounded-md">
-                <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-green-700">
+              <div className="flex items-start gap-2 p-2 bg-success/10 rounded-md">
+                <CheckCircle className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-success">
                   All validated documents pass validation checks
                 </p>
               </div>
@@ -248,11 +248,11 @@ function ValidationSummaryStats({
   return (
     <div className="grid grid-cols-2 gap-2">
       {/* Validated Documents */}
-      <div className="p-2 bg-gray-50 rounded-md">
-        <p className="text-lg font-semibold text-gray-900">
+      <div className="p-2 bg-muted/40 rounded-md">
+        <p className="text-lg font-semibold text-foreground">
           {summary.validatedDocuments}
         </p>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           of {summary.totalDocuments} validated
         </p>
       </div>
@@ -262,20 +262,20 @@ function ValidationSummaryStats({
         className={cn(
           'p-2 rounded-md',
           summary.documentsWithErrors > 0
-            ? 'bg-red-50'
+            ? 'bg-destructive/10'
             : summary.documentsWithWarnings > 0
-            ? 'bg-yellow-50'
-            : 'bg-green-50'
+            ? 'bg-warning/10'
+            : 'bg-success/10'
         )}
       >
         <p
           className={cn(
             'text-lg font-semibold',
             summary.documentsWithErrors > 0
-              ? 'text-red-700'
+              ? 'text-destructive'
               : summary.documentsWithWarnings > 0
-              ? 'text-yellow-700'
-              : 'text-green-700'
+              ? 'text-warning'
+              : 'text-success'
           )}
         >
           {summary.validDocuments}
@@ -284,10 +284,10 @@ function ValidationSummaryStats({
           className={cn(
             'text-xs',
             summary.documentsWithErrors > 0
-              ? 'text-red-600'
+              ? 'text-destructive'
               : summary.documentsWithWarnings > 0
-              ? 'text-yellow-600'
-              : 'text-green-600'
+              ? 'text-warning'
+              : 'text-success'
           )}
         >
           passing
@@ -296,26 +296,26 @@ function ValidationSummaryStats({
 
       {/* Errors */}
       {summary.documentsWithErrors > 0 && (
-        <div className="flex items-center gap-2 p-2 bg-red-50 rounded-md col-span-2">
-          <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+        <div className="flex items-center gap-2 p-2 bg-destructive/10 rounded-md col-span-2">
+          <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />
           <div>
-            <p className="text-sm font-semibold text-red-700">
+            <p className="text-sm font-semibold text-destructive">
               {summary.documentsWithErrors}
             </p>
-            <p className="text-xs text-red-600">with errors</p>
+            <p className="text-xs text-destructive">with errors</p>
           </div>
         </div>
       )}
 
       {/* Warnings (only show if no errors) */}
       {summary.documentsWithErrors === 0 && summary.documentsWithWarnings > 0 && (
-        <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-md col-span-2">
-          <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0" />
+        <div className="flex items-center gap-2 p-2 bg-warning/10 rounded-md col-span-2">
+          <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
           <div>
-            <p className="text-sm font-semibold text-yellow-700">
+            <p className="text-sm font-semibold text-warning">
               {summary.documentsWithWarnings}
             </p>
-            <p className="text-xs text-yellow-600">with warnings</p>
+            <p className="text-xs text-warning">with warnings</p>
           </div>
         </div>
       )}
@@ -340,51 +340,51 @@ function DocumentValidationItem({
     <div
       className={cn(
         'flex items-center gap-2 p-2 rounded-md text-left w-full',
-        onClick && 'hover:bg-gray-100 cursor-pointer',
+        onClick && 'hover:bg-muted cursor-pointer',
         hasErrors
-          ? 'bg-red-50/50'
+          ? 'bg-destructive/10'
           : hasWarnings
-          ? 'bg-yellow-50/50'
-          : 'bg-green-50/50'
+          ? 'bg-warning/10'
+          : 'bg-success/10'
       )}
     >
       {/* Status icon */}
       {hasErrors ? (
-        <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+        <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />
       ) : hasWarnings ? (
-        <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0" />
+        <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
       ) : (
-        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+        <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
       )}
 
       {/* Document info */}
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-gray-900 truncate">
+        <p className="text-xs font-medium text-foreground truncate">
           {document.documentName}
         </p>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           <span className="font-mono">{document.slotCode}</span>
           {' - '}
           {document.errors > 0 && (
-            <span className="text-red-600">
+            <span className="text-destructive">
               {document.errors} error{document.errors !== 1 ? 's' : ''}
             </span>
           )}
           {document.errors > 0 && document.warnings > 0 && ', '}
           {document.warnings > 0 && (
-            <span className="text-yellow-600">
+            <span className="text-warning">
               {document.warnings} warning{document.warnings !== 1 ? 's' : ''}
             </span>
           )}
           {document.errors === 0 && document.warnings === 0 && (
-            <span className="text-green-600">Valid</span>
+            <span className="text-success">Valid</span>
           )}
         </p>
       </div>
 
       {/* Click indicator */}
       {onClick && (
-        <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground/70 flex-shrink-0" />
       )}
     </div>
   );

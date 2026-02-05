@@ -176,7 +176,7 @@ export function AddNodeForm({
         </div>
 
         {createNode.error && (
-          <div className="text-sm text-red-500">
+          <div className="text-sm text-destructive">
             {createNode.error.message}
           </div>
         )}
@@ -229,7 +229,7 @@ export function AddNodeForm({
                 placeholder="e.g., 16.2.1"
                 required
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 The section code (e.g., 16.2.1)
               </p>
             </div>
@@ -242,7 +242,7 @@ export function AddNodeForm({
                 placeholder="e.g., Summary of Clinical Efficacy"
                 required
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 A descriptive title for this node
               </p>
             </div>
@@ -262,7 +262,7 @@ export function AddNodeForm({
                   </option>
                 ))}
               </Select>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 The type of document expected at this location
               </p>
             </div>
@@ -280,7 +280,7 @@ export function AddNodeForm({
                   </option>
                 ))}
               </Select>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Select a parent to nest this node under
               </p>
             </div>
@@ -298,7 +298,7 @@ export function AddNodeForm({
           </div>
 
           {createNode.error && (
-            <div className="text-sm text-red-500 p-2 bg-red-50 rounded-md">
+            <div className="text-sm text-destructive p-2 bg-destructive/10 rounded-md">
               Error: {createNode.error.message}
             </div>
           )}

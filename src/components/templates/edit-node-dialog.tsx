@@ -155,26 +155,26 @@ function EditNodeDialogInner({
 
         {showDeleteConfirm ? (
           <div className="p-6 pt-2 space-y-4">
-            <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-destructive/10 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-medium text-red-900">Confirm Delete</h4>
-                <p className="text-sm text-red-700 mt-1">
+                <h4 className="font-medium text-destructive">Confirm Delete</h4>
+                <p className="text-sm text-destructive mt-1">
                   Are you sure you want to delete <strong>{node.code} - {node.title}</strong>?
                 </p>
                 {hasChildren && (
-                  <p className="text-sm text-red-700 mt-2">
+                  <p className="text-sm text-destructive mt-2">
                     <strong>Warning:</strong> This node has {descendantCount} child node{descendantCount !== 1 ? 's' : ''} that will also be deleted.
                   </p>
                 )}
-                <p className="text-sm text-red-600 mt-2">
+                <p className="text-sm text-destructive mt-2">
                   This action cannot be undone.
                 </p>
               </div>
             </div>
 
             {deleteNode.error && (
-              <div className="text-sm text-red-500 p-2 bg-red-50 rounded-md">
+              <div className="text-sm text-destructive p-2 bg-destructive/10 rounded-md">
                 Error: {deleteNode.error.message}
               </div>
             )}
@@ -261,7 +261,7 @@ function EditNodeDialogInner({
               </div>
 
               {updateNode.error && (
-                <div className="text-sm text-red-500 p-2 bg-red-50 rounded-md">
+                <div className="text-sm text-destructive p-2 bg-destructive/10 rounded-md">
                   Error: {updateNode.error.message}
                 </div>
               )}

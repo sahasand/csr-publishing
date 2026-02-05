@@ -56,7 +56,7 @@ const typeConfig: Record<
   { className: string; label: string }
 > = {
   NOTE: {
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
+    className: 'bg-primary/10 text-primary border-primary/30',
     label: 'Note',
   },
   QUESTION: {
@@ -64,11 +64,11 @@ const typeConfig: Record<
     label: 'Question',
   },
   CORRECTION_REQUIRED: {
-    className: 'bg-red-100 text-red-700 border-red-200',
+    className: 'bg-destructive/10 text-destructive border-destructive/30',
     label: 'Correction Required',
   },
   FYI: {
-    className: 'bg-gray-100 text-gray-700 border-gray-200',
+    className: 'bg-muted text-foreground/80 border-border',
     label: 'FYI',
   },
 };
@@ -128,11 +128,11 @@ export function AnnotationItem({
 
   return (
     <>
-      <div className="border border-gray-200 rounded-lg bg-white shadow-sm">
+      <div className="border border-border rounded-lg bg-card shadow-sm">
         {/* Main Content - Clickable for PDF navigation */}
         <div
           className={cn(
-            'p-3 cursor-pointer hover:bg-gray-50 transition-colors',
+            'p-3 cursor-pointer hover:bg-muted/40 transition-colors',
             onClick && 'cursor-pointer'
           )}
           onClick={onClick}
@@ -165,7 +165,7 @@ export function AnnotationItem({
             </div>
 
             {/* Page Number */}
-            <div className="flex items-center gap-1 text-xs text-gray-500">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <FileText className="h-3 w-3" />
               <span>Page {annotation.pageNumber}</span>
             </div>
@@ -173,19 +173,19 @@ export function AnnotationItem({
 
           {/* Author and Timestamp */}
           <div className="flex items-center gap-2 mb-2">
-            <div className="flex items-center justify-center h-5 w-5 rounded-full bg-gray-100">
-              <User className="h-3 w-3 text-gray-500" />
+            <div className="flex items-center justify-center h-5 w-5 rounded-full bg-muted">
+              <User className="h-3 w-3 text-muted-foreground" />
             </div>
-            <span className="text-xs font-medium text-gray-700">
+            <span className="text-xs font-medium text-foreground/80">
               {annotation.authorName || 'Anonymous'}
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground/70">
               {formatDate(annotation.createdAt)}
             </span>
           </div>
 
           {/* Content */}
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+          <p className="text-sm text-foreground/80 whitespace-pre-wrap">
             {displayContent}
           </p>
 
@@ -193,7 +193,7 @@ export function AnnotationItem({
           {isContentLong && (
             <button
               type="button"
-              className="text-xs text-blue-600 hover:text-blue-700 mt-1"
+              className="text-xs text-primary hover:text-primary mt-1"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsExpanded(!isExpanded);
@@ -205,11 +205,11 @@ export function AnnotationItem({
         </div>
 
         {/* Footer with actions */}
-        <div className="px-3 py-2 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-2">
+        <div className="px-3 py-2 border-t border-border/60 bg-muted/40/50 flex items-center justify-between gap-2">
           {/* Reply Count & Toggle */}
           <button
             type="button"
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground/80"
             onClick={() => setShowReplies(!showReplies)}
           >
             {showReplies ? (
@@ -246,7 +246,7 @@ export function AnnotationItem({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="h-7 w-7 text-success hover:text-success hover:bg-success/10"
                 onClick={(e) => {
                   e.stopPropagation();
                   onStatusChange('RESOLVED');
@@ -279,7 +279,7 @@ export function AnnotationItem({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"
+                className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
                 onClick={(e) => {
                   e.stopPropagation();
                   setDeleteDialogOpen(true);
@@ -295,7 +295,7 @@ export function AnnotationItem({
 
         {/* Replies Section */}
         {showReplies && (
-          <div className="px-3 pb-3 border-t border-gray-100">
+          <div className="px-3 pb-3 border-t border-border/60">
             {/* Existing Replies */}
             {annotation.replies && annotation.replies.length > 0 && (
               <div className="mt-3 space-y-2">
@@ -310,7 +310,7 @@ export function AnnotationItem({
               <form onSubmit={handleReplySubmit} className="mt-3">
                 <div className="flex items-start gap-2">
                   <textarea
-                    className="flex-1 min-h-[60px] rounded-md border border-gray-200 bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                    className="flex-1 min-h-[60px] rounded-md border border-border bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                     placeholder="Write a reply..."
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}

@@ -35,18 +35,18 @@ function IssueItem({ issue }: IssueItemProps) {
       : Info;
   const iconColor =
     issue.severity === 'ERROR'
-      ? 'text-red-500'
+      ? 'text-destructive'
       : issue.severity === 'WARNING'
-      ? 'text-yellow-500'
-      : 'text-blue-500';
+      ? 'text-warning'
+      : 'text-primary';
 
   return (
     <li className="flex items-start gap-2 py-1.5 text-sm">
       <Icon className={cn('h-4 w-4 shrink-0 mt-0.5', iconColor)} />
       <div className="flex-1 min-w-0">
-        <span className="text-gray-700">{issue.message}</span>
+        <span className="text-foreground/80">{issue.message}</span>
         {issue.filePath && (
-          <span className="block text-xs text-gray-500 font-mono truncate" title={issue.filePath}>
+          <span className="block text-xs text-muted-foreground font-mono truncate" title={issue.filePath}>
             {issue.filePath}
           </span>
         )}
@@ -68,10 +68,10 @@ function FileResultsSection({ fileResults }: FileResultsSectionProps) {
   }
 
   return (
-    <div className="border-t border-gray-200 pt-3 mt-3">
+    <div className="border-t border-border pt-3 mt-3">
       <button
         type="button"
-        className="flex items-center gap-2 w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900"
+        className="flex items-center gap-2 w-full text-left text-sm font-medium text-foreground/80 hover:text-foreground"
         onClick={() => setExpanded(!expanded)}
       >
         {expanded ? (
@@ -88,7 +88,7 @@ function FileResultsSection({ fileResults }: FileResultsSectionProps) {
           {filesWithIssues.map((file) => (
             <div key={file.filePath} className="text-sm">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs text-gray-600 truncate" title={file.filePath}>
+                <span className="font-mono text-xs text-muted-foreground truncate" title={file.filePath}>
                   {file.filePath.split('/').pop()}
                 </span>
                 {file.errorCount > 0 && (
@@ -103,12 +103,12 @@ function FileResultsSection({ fileResults }: FileResultsSectionProps) {
                 )}
               </div>
               {file.issues.length > 0 && (
-                <ul className="mt-1 pl-2 border-l-2 border-gray-200">
+                <ul className="mt-1 pl-2 border-l-2 border-border">
                   {file.issues.slice(0, 3).map((issue, idx) => (
                     <IssueItem key={`${file.filePath}-${idx}`} issue={issue} />
                   ))}
                   {file.issues.length > 3 && (
-                    <li className="text-xs text-gray-400 italic py-1">
+                    <li className="text-xs text-muted-foreground/70 italic py-1">
                       +{file.issues.length - 3} more issue{file.issues.length - 3 !== 1 ? 's' : ''}...
                     </li>
                   )}
@@ -144,10 +144,10 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
     <Card
       className={cn(
         allPassed
-          ? 'border-green-200 bg-green-50/30'
+          ? 'border-success/30 bg-success/10'
           : hasErrors
-          ? 'border-red-200 bg-red-50/30'
-          : 'border-yellow-200 bg-yellow-50/30',
+          ? 'border-destructive/30 bg-destructive/10'
+          : 'border-warning/30 bg-warning/10',
         className
       )}
     >
@@ -155,11 +155,11 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
         <CardTitle className="text-sm flex items-center justify-between">
           <div className="flex items-center gap-2">
             {allPassed ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-success" />
             ) : hasErrors ? (
-              <XCircle className="h-4 w-4 text-red-500" />
+              <XCircle className="h-4 w-4 text-destructive" />
             ) : (
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <AlertTriangle className="h-4 w-4 text-warning" />
             )}
             Validation Results
           </div>
@@ -184,20 +184,20 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
         <dl className="space-y-2 text-sm">
           {/* XML Validation Status */}
           <div className="flex items-center justify-between">
-            <dt className="text-gray-500 flex items-center gap-1.5">
+            <dt className="text-muted-foreground flex items-center gap-1.5">
               <Code className="h-3.5 w-3.5" />
               XML Validation
             </dt>
             <dd className="flex items-center gap-1.5">
               {xmlValid ? (
                 <>
-                  <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-                  <span className="text-green-600 font-medium">Valid</span>
+                  <CheckCircle className="h-3.5 w-3.5 text-success" />
+                  <span className="text-success font-medium">Valid</span>
                 </>
               ) : (
                 <>
-                  <XCircle className="h-3.5 w-3.5 text-red-500" />
-                  <span className="text-red-600 font-medium">Invalid</span>
+                  <XCircle className="h-3.5 w-3.5 text-destructive" />
+                  <span className="text-destructive font-medium">Invalid</span>
                 </>
               )}
             </dd>
@@ -205,23 +205,23 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
 
           {/* Files Validated */}
           <div className="flex items-center justify-between">
-            <dt className="text-gray-500 flex items-center gap-1.5">
+            <dt className="text-muted-foreground flex items-center gap-1.5">
               <FileText className="h-3.5 w-3.5" />
               Files Validated
             </dt>
-            <dd className="font-medium text-gray-700">
+            <dd className="font-medium text-foreground/80">
               {packageReport.summary.validatedFiles} / {packageReport.summary.totalFiles}
             </dd>
           </div>
 
           {/* Package Status */}
           <div className="flex items-center justify-between">
-            <dt className="text-gray-500">Package Status</dt>
+            <dt className="text-muted-foreground">Package Status</dt>
             <dd>
               {packageReport.valid ? (
-                <span className="text-green-600 font-medium">Valid</span>
+                <span className="text-success font-medium">Valid</span>
               ) : (
-                <span className="text-red-600 font-medium">Has Issues</span>
+                <span className="text-destructive font-medium">Has Issues</span>
               )}
             </dd>
           </div>
@@ -229,8 +229,8 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
 
         {/* Errors Section */}
         {errors.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-red-200">
-            <h4 className="text-xs font-medium text-red-700 mb-2 flex items-center gap-1.5">
+          <div className="mt-4 pt-3 border-t border-destructive/30">
+            <h4 className="text-xs font-medium text-destructive mb-2 flex items-center gap-1.5">
               <XCircle className="h-3.5 w-3.5" />
               Errors ({errors.length})
             </h4>
@@ -239,7 +239,7 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
                 <IssueItem key={`error-${idx}`} issue={issue} />
               ))}
               {!showAllIssues && errors.length > 3 && (
-                <li className="text-xs text-gray-400 italic py-1">
+                <li className="text-xs text-muted-foreground/70 italic py-1">
                   +{errors.length - 3} more error{errors.length - 3 !== 1 ? 's' : ''}...
                 </li>
               )}
@@ -249,8 +249,8 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
 
         {/* Warnings Section */}
         {warnings.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-yellow-200">
-            <h4 className="text-xs font-medium text-yellow-700 mb-2 flex items-center gap-1.5">
+          <div className="mt-4 pt-3 border-t border-warning/30">
+            <h4 className="text-xs font-medium text-warning mb-2 flex items-center gap-1.5">
               <AlertTriangle className="h-3.5 w-3.5" />
               Warnings ({warnings.length})
             </h4>
@@ -259,7 +259,7 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
                 <IssueItem key={`warning-${idx}`} issue={issue} />
               ))}
               {!showAllIssues && warnings.length > 3 && (
-                <li className="text-xs text-gray-400 italic py-1">
+                <li className="text-xs text-muted-foreground/70 italic py-1">
                   +{warnings.length - 3} more warning{warnings.length - 3 !== 1 ? 's' : ''}...
                 </li>
               )}
@@ -269,8 +269,8 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
 
         {/* Info Section */}
         {infos.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-blue-200">
-            <h4 className="text-xs font-medium text-blue-700 mb-2 flex items-center gap-1.5">
+          <div className="mt-4 pt-3 border-t border-primary/30">
+            <h4 className="text-xs font-medium text-primary mb-2 flex items-center gap-1.5">
               <Info className="h-3.5 w-3.5" />
               Info ({infos.length})
             </h4>
@@ -279,7 +279,7 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
                 <IssueItem key={`info-${idx}`} issue={issue} />
               ))}
               {!showAllIssues && infos.length > 2 && (
-                <li className="text-xs text-gray-400 italic py-1">
+                <li className="text-xs text-muted-foreground/70 italic py-1">
                   +{infos.length - 2} more...
                 </li>
               )}
@@ -292,7 +292,7 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
 
         {/* Show All Toggle */}
         {allIssues.length > 5 && (
-          <div className="mt-4 pt-3 border-t border-gray-200">
+          <div className="mt-4 pt-3 border-t border-border">
             <Button
               variant="outline"
               size="sm"
@@ -306,8 +306,8 @@ export function ValidationResults({ validation, className }: ValidationResultsPr
 
         {/* All Passed Message */}
         {allPassed && (
-          <div className="mt-4 pt-3 border-t border-green-200">
-            <p className="text-sm text-green-700 text-center">
+          <div className="mt-4 pt-3 border-t border-success/30">
+            <p className="text-sm text-success text-center">
               All validation checks passed. Package is ready for submission.
             </p>
           </div>

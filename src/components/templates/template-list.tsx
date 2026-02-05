@@ -21,14 +21,14 @@ export function TemplateList() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12 text-red-500">
+      <div className="text-center py-12 text-destructive">
         Failed to load templates: {error.message}
       </div>
     );
@@ -37,7 +37,7 @@ export function TemplateList() {
   if (!templates?.length) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-gray-500">
+        <CardContent className="py-12 text-center text-muted-foreground">
           No templates found. Create your first template to get started.
         </CardContent>
       </Card>
@@ -53,7 +53,7 @@ export function TemplateList() {
               <CardTitle className="text-lg flex items-center gap-2">
                 {template.name}
                 {template.isDefault && (
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                  <Star className="h-4 w-4 text-warning fill-warning" />
                 )}
               </CardTitle>
               <CardDescription>
@@ -68,7 +68,7 @@ export function TemplateList() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 <span>{template._count?.nodes || 0} nodes</span>
                 <span className="mx-2">·</span>
                 <span>{template._count?.studies || 0} studies using</span>
@@ -93,7 +93,7 @@ export function TemplateList() {
                   disabled={deleteTemplate.isPending || (template._count?.studies || 0) > 0}
                   title={template._count?.studies ? 'Cannot delete: template in use' : 'Delete template'}
                 >
-                  <Trash2 className="h-4 w-4 text-red-500" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
             </div>
