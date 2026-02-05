@@ -332,3 +332,58 @@ export interface StudyValidationResponse {
   summary: StudyValidationSummaryStats;
   documents: DocumentValidationSummary[];
 }
+
+// Document Workflow Types
+export type DocumentStatusType =
+  | 'DRAFT'
+  | 'PROCESSING'
+  | 'PROCESSED'
+  | 'PROCESSING_FAILED'
+  | 'IN_REVIEW'
+  | 'CORRECTIONS_NEEDED'
+  | 'APPROVED'
+  | 'PUBLISHED';
+
+export interface DocumentStatusHistory {
+  id: string;
+  documentId: string;
+  fromStatus: DocumentStatusType;
+  toStatus: DocumentStatusType;
+  userId: string | null;
+  userName: string;
+  comment: string | null;
+  createdAt: Date | string;
+}
+
+export interface TransitionDocumentInput {
+  comment?: string;
+  userName?: string;
+}
+
+export interface DocumentWithHistory extends Document {
+  statusHistory?: DocumentStatusHistory[];
+}
+
+// Valid workflow transitions
+export const WORKFLOW_TRANSITIONS: Record<DocumentStatusType, DocumentStatusType[]> = {
+  DRAFT: ['IN_REVIEW'],
+  PROCESSING: [],
+  PROCESSED: ['IN_REVIEW'],
+  PROCESSING_FAILED: ['DRAFT'],
+  IN_REVIEW: ['APPROVED', 'CORRECTIONS_NEEDED'],
+  CORRECTIONS_NEEDED: ['DRAFT', 'IN_REVIEW'],
+  APPROVED: ['PUBLISHED', 'CORRECTIONS_NEEDED'],
+  PUBLISHED: ['CORRECTIONS_NEEDED'],
+};
+
+// Status display metadata
+export const STATUS_CONFIG: Record<DocumentStatusType, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info' }> = {
+  DRAFT: { label: 'Draft', variant: 'secondary' },
+  PROCESSING: { label: 'Processing', variant: 'info' },
+  PROCESSED: { label: 'Processed', variant: 'info' },
+  PROCESSING_FAILED: { label: 'Failed', variant: 'destructive' },
+  IN_REVIEW: { label: 'In Review', variant: 'warning' },
+  CORRECTIONS_NEEDED: { label: 'Corrections Needed', variant: 'destructive' },
+  APPROVED: { label: 'Approved', variant: 'success' },
+  PUBLISHED: { label: 'Published', variant: 'default' },
+};
