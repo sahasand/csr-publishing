@@ -28,7 +28,8 @@ import {
   FileX,
   Trash2,
 } from 'lucide-react';
-import type { Document, AnnotationWithReplies } from '@/types';
+import { StatusBadge, WorkflowActions } from '@/components/workflow';
+import type { Document, AnnotationWithReplies, DocumentStatusType } from '@/types';
 
 export interface DocumentViewerProps {
   /** ID of the document to display */
@@ -148,22 +149,29 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border flex-shrink-0">
         <div className="flex items-center gap-4">
-          <h2 className="text-sm font-medium text-foreground truncate max-w-[300px]" title={document.sourceFileName}>
+          <h2 className="text-sm font-medium text-foreground truncate max-w-[200px]" title={document.sourceFileName}>
             {document.sourceFileName}
           </h2>
           <span className="text-xs text-muted-foreground">
             v{document.version}
           </span>
+          <StatusBadge status={document.status as DocumentStatusType} />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          {/* Workflow actions */}
+          <WorkflowActions
+            documentId={documentId}
+            currentStatus={document.status as DocumentStatusType}
+          />
+
           {/* Page info display */}
           <span className="text-xs text-muted-foreground">
             Page {currentPage} of {totalPages || '...'}
           </span>
 
           {/* Zoom info display */}
-          <span className="text-xs text-muted-foreground mx-2">
+          <span className="text-xs text-muted-foreground">
             {zoom}%
           </span>
 
