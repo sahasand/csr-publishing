@@ -4,11 +4,13 @@
 
 CSR Publishing - A clinical study report (CSR) document management and eCTD packaging tool for regulatory submissions. Built with Next.js 16, Prisma 7, and SQLite.
 
+**Repository**: https://github.com/sahasand/csr-publishing
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router)
 - **Database**: SQLite with Prisma 7 (driver adapter pattern)
-- **UI**: React 19, Tailwind CSS 4, Radix UI
+- **UI**: React 19, Tailwind CSS 4, Radix UI (TraceScribe theme)
 - **State**: Zustand, TanStack Query
 - **PDF**: pdf-lib for processing
 - **Testing**: Vitest
@@ -32,6 +34,9 @@ npm run lint         # ESLint
 npx prisma generate  # Regenerate Prisma client
 npx prisma migrate dev --name <name>  # Create migration
 npx prisma studio    # Open database GUI
+
+npx tsx prisma/seed-template.ts        # Seed default CSR template
+npx tsx prisma/seed-validation-rules.ts # Seed PDF validation rules
 ```
 
 ## Project Structure
@@ -52,6 +57,7 @@ src/
 │   ├── db.ts              # Prisma client (SQLite adapter)
 │   ├── storage.ts         # File storage utilities
 │   ├── process-document.ts # Direct document processing
+│   ├── standard-sections.ts # ICH E3 Module 16 section definitions
 │   ├── validation/        # PDF validation checks
 │   ├── packaging/         # eCTD package generation
 │   └── jobs/              # Job handlers (metadata, validation)
@@ -105,6 +111,16 @@ Requires persistent volume at `/data`:
 DATABASE_URL=file:/data/csr.db
 UPLOAD_DIR=/data/uploads
 ```
+
+## ICH E3 Standard Sections
+
+Templates can be created with pre-populated ICH E3 Module 16 sections (18 standard CSR sections). The section definitions live in `src/lib/standard-sections.ts` and include:
+
+- **16.1.x**: Protocol documents (Study Protocol, Case Report Form, Informed Consent, etc.)
+- **16.2.x**: Data listings (Patient Demographics, Protocol Deviations, Efficacy/Safety Data)
+- **16.3.x**: Publications
+
+When creating a template via the UI, check "Start with ICH E3 standard sections" to auto-populate. The API accepts `useStandardSections: true` in POST `/api/templates`.
 
 ## Code Conventions
 
