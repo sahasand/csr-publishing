@@ -1,0 +1,312 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ============ STUDIES ============
+
+model Study {
+  id               String   @id @default(uuid())
+  studyId          String   @unique // Protocol number
+  sponsor          String
+  therapeuticArea  String?
+  phase            String?
+  status           StudyStatus @default(ACTIVE)
+  activeTemplateId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  activeTemplate   StructureTemplate? @relation("ActiveTemplate", fields: [activeTemplateId], references: [id])
+  documents        Document[]
+
+  @@index([studyId])
+  @@index([status])
+}
+
+enum StudyStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+// ============ STRUCTURE TEMPLATES ============
+
+model StructureTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  version   Int      @default(1)
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  nodes   StructureNode[]
+  studies Study[]         @relation("ActiveTemplate")
+
+  @@index([name])
+}
+
+model StructureNode {
+  id              String   @id @default(uuid())
+  templateId      String
+  parentId        String?
+  code            String   // e.g., "16.2.1"
+  title           String
+  documentType    DocumentType @default(PDF)
+  required        Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  validationRules String   @default("[]") // JSON array of rule IDs
+  checklistId     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  template  StructureTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  parent    StructureNode?    @relation("NodeHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children  StructureNode[]   @relation("NodeHierarchy")
+  documents Document[]
+  checklist Checklist?        @relation(fields: [checklistId], references: [id])
+
+  @@unique([templateId, code])
+  @@index([templateId])
+  @@index([parentId])
+  @@index([code])
+}
+
+enum DocumentType {
+  PDF
+  DATASET
+  LISTING
+  FIGURE
+  OTHER
+}
+
+// ============ DOCUMENTS ============
+
+model Document {
+  id              String   @id @default(uuid())
+  studyId         String
+  slotId          String   // Structure node ID
+  version         Int      @default(1)
+
+  // File references
+  sourceFileName  String
+  sourcePath      String
+  processedPath   String?
+
+  // Status
+  status          DocumentStatus @default(DRAFT)
+  processingError String?
+
+  // Metadata
+  mimeType        String?
+  pageCount       Int?
+  fileSize        Int      // bytes
+  pdfVersion      String?
+  isPdfA          Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  study              Study               @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  slot               StructureNode       @relation(fields: [slotId], references: [id])
+  annotations        Annotation[]
+  validationResults  ValidationResult[]
+  checklistResponse  ChecklistResponse?
+  processingJobs     ProcessingJob[]
+
+  @@unique([studyId, slotId, version])
+  @@index([studyId])
+  @@index([slotId])
+  @@index([status])
+  @@index([sourceFileName])
+}
+
+enum DocumentStatus {
+  DRAFT
+  PROCESSING
+  PROCESSED
+  PROCESSING_FAILED
+  IN_REVIEW
+  CORRECTIONS_NEEDED
+  APPROVED
+  PUBLISHED
+}
+
+// ============ ANNOTATIONS ============
+
+model Annotation {
+  id          String   @id @default(uuid())
+  documentId  String
+  authorId    String   // For future user system
+  authorName  String   @default("Reviewer")
+  type        AnnotationType
+  status      AnnotationStatus @default(OPEN)
+  pageNumber  Int
+  coordinates Json?    // { x, y, width, height }
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  resolvedAt  DateTime?
+
+  document Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  replies  AnnotationReply[]
+
+  @@index([documentId])
+  @@index([status])
+}
+
+model AnnotationReply {
+  id           String   @id @default(uuid())
+  annotationId String
+  authorId     String
+  authorName   String   @default("Reviewer")
+  content      String
+  createdAt    DateTime @default(now())
+
+  annotation Annotation @relation(fields: [annotationId], references: [id], onDelete: Cascade)
+
+  @@index([annotationId])
+}
+
+enum AnnotationType {
+  NOTE
+  QUESTION
+  CORRECTION_REQUIRED
+  FYI
+}
+
+enum AnnotationStatus {
+  OPEN
+  RESOLVED
+  WONT_FIX
+}
+
+// ============ CHECKLISTS ============
+
+model Checklist {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items     ChecklistItem[]
+  nodes     StructureNode[]
+  responses ChecklistResponse[]
+
+  @@index([name])
+}
+
+model ChecklistItem {
+  id            String   @id @default(uuid())
+  checklistId   String
+  category      String   // e.g., "Formatting", "Pagination"
+  text          String
+  autoCheck     Boolean  @default(false)
+  autoCheckRule String?  // Validation rule ID to auto-populate
+  required      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@index([checklistId])
+}
+
+model ChecklistResponse {
+  id          String   @id @default(uuid())
+  documentId  String   @unique
+  checklistId String
+  responses   Json     // Array of { itemId, result, notes }
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  document  Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  checklist Checklist @relation(fields: [checklistId], references: [id])
+
+  @@index([checklistId])
+}
+
+// ============ VALIDATION ============
+
+model ValidationRule {
+  id        String   @id @default(uuid())
+  name      String
+  category  ValidationCategory
+  checkFn   String   // Function identifier
+  params    String   @default("{}")
+  severity  ValidationSeverity @default(ERROR)
+  autoFix   Boolean  @default(false)
+  message   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model ValidationResult {
+  id         String   @id @default(uuid())
+  documentId String
+  ruleId     String
+  ruleName   String
+  passed     Boolean
+  message    String?
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([passed])
+}
+
+enum ValidationCategory {
+  PDF_COMPLIANCE
+  ECTD_TECHNICAL
+  FORMATTING
+  CONTENT
+}
+
+enum ValidationSeverity {
+  ERROR
+  WARNING
+  INFO
+}
+
+// ============ PROCESSING JOBS ============
+
+model ProcessingJob {
+  id         String   @id @default(uuid())
+  documentId String
+  jobType    JobType
+  status     JobStatus @default(PENDING)
+  progress   Int       @default(0)
+  error      String?
+  result     Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  startedAt  DateTime?
+  completedAt DateTime?
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([status])
+}
+
+enum JobType {
+  PDF_CONVERSION
+  PDF_VALIDATION
+  METADATA_EXTRACTION
+  PACKAGE_EXPORT
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}

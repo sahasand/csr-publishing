@@ -1,0 +1,15 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npx prisma migrate deploy && npm start"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Mount persistent volume at /data for SQLite database and uploads
+# Configure in Railway dashboard:
+# - Volume mount path: /data
+# - DATABASE_URL: file:/data/csr.db
+# - UPLOAD_DIR: /data/uploads

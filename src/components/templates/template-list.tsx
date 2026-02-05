@@ -1,0 +1,105 @@
+'use client';
+
+import Link from 'next/link';
+import { useTemplates, useDeleteTemplate } from '@/hooks/use-templates';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { formatDate } from '@/lib/utils';
+import { Trash2, ExternalLink, Loader2, Star } from 'lucide-react';
+
+export function TemplateList() {
+  const { data: templates, isLoading, error } = useTemplates();
+  const deleteTemplate = useDeleteTemplate();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12 text-red-500">
+        Failed to load templates: {error.message}
+      </div>
+    );
+  }
+
+  if (!templates?.length) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center text-gray-500">
+          No templates found. Create your first template to get started.
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {templates.map((template) => (
+        <Card key={template.id}>
+          <CardHeader className="flex flex-row items-start justify-between">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                {template.name}
+                {template.isDefault && (
+                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                )}
+              </CardTitle>
+              <CardDescription>
+                Version {template.version}
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              {template.isDefault && (
+                <Badge variant="secondary">Default</Badge>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-500">
+                <span>{template._count?.nodes || 0} nodes</span>
+                <span className="mx-2">·</span>
+                <span>{template._count?.studies || 0} studies using</span>
+                <span className="mx-2">·</span>
+                <span>Updated {formatDate(template.updatedAt)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link href={`/templates/${template.id}`}>
+                  <Button variant="outline" size="sm">
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (confirm('Delete this template? This cannot be undone.')) {
+                      deleteTemplate.mutate(template.id);
+                    }
+                  }}
+                  disabled={deleteTemplate.isPending || (template._count?.studies || 0) > 0}
+                  title={template._count?.studies ? 'Cannot delete: template in use' : 'Delete template'}
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
