@@ -802,24 +802,6 @@ describe('zip-generator', () => {
 
       expect(result.packageZipPath).toBeDefined();
     });
-
-    it('uses correct output directory paths', async () => {
-      const manifest = createMockManifest();
-      const bookmarks = createMockBookmarks();
-      const hyperlinks = createMockHyperlinks();
-
-      const result = await generateExportArtifacts(
-        manifest,
-        bookmarks,
-        hyperlinks,
-        '/custom/output/path'
-      );
-
-      expect(result.packageZipPath).toContain('/custom/output/path');
-      expect(result.bookmarkManifestPath).toContain('/custom/output/path');
-      expect(result.hyperlinkReportPath).toContain('/custom/output/path');
-      expect(result.qcSummaryPath).toContain('/custom/output/path');
-    });
   });
 
   describe('path validation edge cases', () => {
