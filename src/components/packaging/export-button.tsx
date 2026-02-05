@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Download, Loader2, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ValidationResults } from './validation-results';
 
@@ -56,6 +57,8 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
       // Store result for showing in modal
       setLastExportResult(result);
 
+      toast.success('Package exported successfully');
+
       // Trigger download
       triggerDownload(result.downloadUrl);
 
@@ -67,7 +70,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
       // Notify parent
       onExportComplete?.(result);
     } catch {
-      // Error is handled by mutation state
+      toast.error('Export failed');
     }
   };
 

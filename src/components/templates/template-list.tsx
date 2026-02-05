@@ -14,11 +14,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { formatDate } from '@/lib/utils';
 import { Trash2, ExternalLink, Star } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function TemplateList() {
   const [page, setPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
   const { data, isLoading, error } = useTemplates({ page, pageSize: 20 });
   const templates = data?.data;
   const pagination = data?.pagination;
@@ -90,9 +94,8 @@ export function TemplateList() {
                   variant="ghost"
                   size="icon"
                   onClick={() => {
-                    if (confirm('Delete this template? This cannot be undone.')) {
-                      deleteTemplate.mutate(template.id);
-                    }
+                    setTemplateToDelete(template.id);
+                    setDeleteDialogOpen(true);
                   }}
                   disabled={deleteTemplate.isPending || (template._count?.studies || 0) > 0}
                   title={template._count?.studies ? 'Cannot delete: template in use' : 'Delete template'}
@@ -109,8 +112,30 @@ export function TemplateList() {
           page={pagination.page}
           totalPages={pagination.totalPages}
           onPageChange={setPage}
+          total={pagination.total}
+          pageSize={20}
         />
       )}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Template"
+        description="Are you sure you want to delete this template? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="destructive"
+        isPending={deleteTemplate.isPending}
+        onConfirm={() => {
+          if (templateToDelete) {
+            deleteTemplate.mutate(templateToDelete, {
+              onSuccess: () => {
+                toast.success('Template deleted');
+                setDeleteDialogOpen(false);
+                setTemplateToDelete(null);
+              },
+            });
+          }
+        }}
+      />
     </div>
   );
 }

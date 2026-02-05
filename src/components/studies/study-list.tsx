@@ -14,11 +14,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { formatDate } from '@/lib/utils';
 import { Trash2, ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function StudyList() {
   const [page, setPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [studyToDelete, setStudyToDelete] = useState<string | null>(null);
   const { data, isLoading, error } = useStudies({ page, pageSize: 20 });
   const studies = data?.data;
   const pagination = data?.pagination;
@@ -93,9 +97,8 @@ export function StudyList() {
                   variant="ghost"
                   size="icon"
                   onClick={() => {
-                    if (confirm('Delete this study?')) {
-                      deleteStudy.mutate(study.id);
-                    }
+                    setStudyToDelete(study.id);
+                    setDeleteDialogOpen(true);
                   }}
                   disabled={deleteStudy.isPending}
                 >
@@ -111,8 +114,30 @@ export function StudyList() {
           page={pagination.page}
           totalPages={pagination.totalPages}
           onPageChange={setPage}
+          total={pagination.total}
+          pageSize={20}
         />
       )}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Study"
+        description="Are you sure you want to delete this study? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="destructive"
+        isPending={deleteStudy.isPending}
+        onConfirm={() => {
+          if (studyToDelete) {
+            deleteStudy.mutate(studyToDelete, {
+              onSuccess: () => {
+                toast.success('Study deleted');
+                setDeleteDialogOpen(false);
+                setStudyToDelete(null);
+              },
+            });
+          }
+        }}
+      />
     </div>
   );
 }

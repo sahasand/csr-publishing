@@ -26,7 +26,7 @@ import {
 import { DocumentViewer } from '@/components/studies/document-viewer';
 import { DocumentUpload } from '@/components/studies/document-upload';
 import { ExportButton } from '@/components/packaging/export-button';
-import { formatBytes } from '@/lib/utils';
+import { formatBytes, cn } from '@/lib/utils';
 import {
   ArrowLeft,
   Loader2,
@@ -39,10 +39,17 @@ import {
   CheckCircle,
   Circle,
   Trash2,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
 } from 'lucide-react';
 import type { StructureNode, Document } from '@/types';
 import { StudyValidationPanel } from '@/components/studies/study-validation-panel';
 import { BulkWorkflowActions } from '@/components/workflow';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbLink, BreadcrumbPage } from '@/components/ui/breadcrumb';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 interface Template {
   id: string;
@@ -89,6 +96,8 @@ export default function StudyWorkspacePage() {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
 
   const deleteDocument = useDeleteDocument();
 
@@ -166,6 +175,21 @@ export default function StudyWorkspacePage() {
     setDeleteDialogOpen(false);
     setDocumentToDelete(null);
   };
+
+  // Keyboard shortcuts for sidebar toggling and deselection
+  const shortcuts = useMemo(() => ({
+    '[': () => setLeftCollapsed(prev => !prev),
+    ']': () => setRightCollapsed(prev => !prev),
+    'Escape': () => {
+      if (selectedDocumentId) {
+        setSelectedDocumentId(null);
+      } else if (selectedNodeId) {
+        setSelectedNodeId(null);
+      }
+    },
+  }), [selectedDocumentId, selectedNodeId]);
+
+  useKeyboardShortcuts(shortcuts);
 
   if (isLoading) {
     return (
@@ -308,17 +332,29 @@ export default function StudyWorkspacePage() {
               Back to Study
             </Button>
             <div className="h-4 w-px bg-muted/60" />
-            <span className="text-sm text-muted-foreground">
-              {study.studyId}
+            <Breadcrumb>
+              <BreadcrumbItem>
+                <BreadcrumbLink onClick={() => { setSelectedDocumentId(null); setSelectedNodeId(null); }}>
+                  {study.studyId}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
               {selectedNode && (
                 <>
-                  <span className="mx-2 text-muted-foreground/70">/</span>
-                  <span className="font-mono text-xs">{selectedNode.code}</span>
-                  <span className="mx-1">-</span>
-                  {selectedNode.title}
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink onClick={() => setSelectedDocumentId(null)}>
+                      <span className="font-mono text-xs">{selectedNode.code}</span>
+                      <span className="mx-1">&mdash;</span>
+                      {selectedNode.title}
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
                 </>
               )}
-            </span>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Document</BreadcrumbPage>
+              </BreadcrumbItem>
+            </Breadcrumb>
           </div>
         </header>
 
@@ -373,62 +409,94 @@ export default function StudyWorkspacePage() {
       {/* Three-panel layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Structure Tree */}
-        <aside className="w-[280px] flex-shrink-0 border-r border-border bg-muted/40 overflow-y-auto">
-          <div className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <FolderTree className="h-4 w-4 text-muted-foreground" />
-              <h2 className="font-semibold text-sm text-foreground/80">
-                Document Sections
-              </h2>
+        <aside className={cn(
+          'flex-shrink-0 border-r border-border bg-muted/40 transition-all duration-200 overflow-hidden',
+          leftCollapsed ? 'w-10' : 'w-[280px]'
+        )}>
+          {leftCollapsed ? (
+            <div className="flex flex-col items-center pt-4">
+              <button
+                onClick={() => setLeftCollapsed(false)}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                title="Expand sections panel"
+              >
+                <PanelLeftOpen className="h-4 w-4" />
+              </button>
             </div>
-            <p className="text-xs text-muted-foreground mb-4">
-              Click a section to upload or view documents
-            </p>
-
-            <div className="space-y-1">
-              {study.activeTemplate.nodes?.filter((node: StructureNode) => !node.parentId).map((node: StructureNode) => {
-                const hasDoc = nodeHasDocuments(node.id);
-                const isSelected = selectedNodeId === node.id;
-
-                return (
-                  <button
-                    key={node.id}
-                    onClick={() => setSelectedNodeId(node.id)}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-2 ${
-                      isSelected
-                        ? 'bg-primary/10 text-foreground font-medium'
-                        : 'text-muted-foreground hover:bg-muted'
-                    }`}
-                  >
-                    {hasDoc ? (
-                      <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
-                    ) : (
-                      <Circle className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <span className="font-mono text-xs text-muted-foreground/70 mr-1">
-                        {node.code}
-                      </span>
-                      <span className="truncate">{node.title}</span>
-                    </div>
-                    {isSelected && (
-                      <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
-                    )}
-                  </button>
-                );
-              })}
-              {(!study.activeTemplate.nodes || study.activeTemplate.nodes.length === 0) && (
-                <div className="text-center py-6 text-muted-foreground">
-                  <p className="text-sm">No sections in template</p>
-                  <Link href={`/templates/${study.activeTemplate.id}`}>
-                    <Button variant="outline" size="sm" className="mt-2">
-                      Edit Template
-                    </Button>
-                  </Link>
+          ) : (
+            <div className="p-4 overflow-y-auto h-full">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <FolderTree className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="font-semibold text-sm text-foreground/80">
+                    Document Sections
+                  </h2>
                 </div>
-              )}
+                <button
+                  onClick={() => setLeftCollapsed(true)}
+                  className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  title="Collapse sections panel"
+                >
+                  <PanelLeftClose className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">
+                Click a section to upload or view documents
+              </p>
+
+              <div className="space-y-1">
+                {study.activeTemplate.nodes?.filter((node: StructureNode) => !node.parentId).map((node: StructureNode) => {
+                  const hasDoc = nodeHasDocuments(node.id);
+                  const isSelected = selectedNodeId === node.id;
+
+                  return (
+                    <Tooltip key={node.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => setSelectedNodeId(node.id)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-2 ${
+                            isSelected
+                              ? 'bg-primary/10 text-foreground font-medium'
+                              : 'text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          {hasDoc ? (
+                            <CheckCircle className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <Circle className="h-4 w-4 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <span className="block font-mono text-xs text-muted-foreground/70">
+                              {node.code}
+                            </span>
+                            <span className="block text-sm truncate">
+                              {node.title}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" align="start">
+                        <span className="font-mono text-xs">{node.code}</span> — {node.title}
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+                {(!study.activeTemplate.nodes || study.activeTemplate.nodes.length === 0) && (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <p className="text-sm">No sections in template</p>
+                    <Link href={`/templates/${study.activeTemplate.id}`}>
+                      <Button variant="outline" size="sm" className="mt-2">
+                        Edit Template
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </aside>
 
         {/* Center Panel - Document Workspace */}
@@ -546,40 +614,27 @@ export default function StudyWorkspacePage() {
               </div>
             ) : (
               /* No Section Selected - Show Instructions */
-              <div className="flex flex-col items-center justify-center h-full min-h-[500px]">
-                <div className="max-w-md text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ChevronLeft className="h-8 w-8 text-primary" />
+              <div className="flex flex-col items-center justify-center h-full min-h-[500px] animate-fade-in">
+                <div className="max-w-sm text-center">
+                  <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <ChevronLeft className="h-7 w-7 text-primary animate-slide-in-left" />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
                     Select a Section
                   </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Choose a section from the list on the left to upload documents.
-                    Each section represents a part of your submission package.
+                  <p className="text-sm text-muted-foreground mb-5">
+                    Pick a section from the left to upload and manage documents.
                   </p>
-
-                  <div className="bg-muted/40 rounded-lg p-4 text-left">
-                    <p className="text-sm font-medium text-foreground/80 mb-2">How it works:</p>
-                    <ol className="text-sm text-muted-foreground space-y-2">
-                      <li className="flex items-start gap-2">
-                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">1</span>
-                        <span>Click a section in the left panel</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">2</span>
-                        <span>Upload a document (PDF, Word, etc.)</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0">3</span>
-                        <span>Repeat for each section</span>
-                      </li>
-                    </ol>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    <span className="text-muted-foreground">= section has a document</span>
+                  <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Circle className="h-3 w-3 text-muted-foreground/50" />
+                      Empty
+                    </span>
+                    <span className="text-muted-foreground/30">|</span>
+                    <span className="flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3 text-success" />
+                      Has document
+                    </span>
                   </div>
                 </div>
               </div>
@@ -588,96 +643,125 @@ export default function StudyWorkspacePage() {
         </main>
 
         {/* Right Panel - Context Sidebar */}
-        <aside className="w-[280px] flex-shrink-0 border-l border-border bg-muted/40 overflow-y-auto">
-          <div className="p-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Info className="h-4 w-4 text-muted-foreground" />
-              <h2 className="font-semibold text-sm text-foreground/80">
-                Study Info
-              </h2>
+        <aside className={cn(
+          'flex-shrink-0 border-l border-border bg-muted/40 transition-all duration-200 overflow-hidden',
+          rightCollapsed ? 'w-10' : 'w-[280px]'
+        )}>
+          {rightCollapsed ? (
+            <div className="flex flex-col items-center pt-4">
+              <button
+                onClick={() => setRightCollapsed(false)}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                title="Expand info panel"
+              >
+                <PanelRightOpen className="h-4 w-4" />
+              </button>
             </div>
+          ) : (
+            <div className="p-4 overflow-y-auto h-full">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="font-semibold text-sm text-foreground/80">
+                    Study Info
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setRightCollapsed(true)}
+                  className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  title="Collapse info panel"
+                >
+                  <PanelRightClose className="h-3.5 w-3.5" />
+                </button>
+              </div>
 
-            <div className="space-y-4">
-              {/* Progress */}
-              <Card>
-                <CardContent className="pt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-foreground/80">Progress</span>
-                    <span className="text-sm text-muted-foreground">
-                      {sectionProgress.filled}/{sectionProgress.total}
-                    </span>
-                  </div>
-                  <div className="w-full bg-muted/60 rounded-full h-2">
-                    <div
-                      className="bg-success h-2 rounded-full transition-all"
-                      style={{
-                        width: `${sectionProgress.total > 0
-                          ? (sectionProgress.filled / sectionProgress.total) * 100
-                          : 0}%`
-                      }}
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {sectionProgress.total - sectionProgress.filled} sections remaining
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Bulk Workflow Actions */}
-              <BulkWorkflowActions studyId={id} documents={documents} />
-
-              {/* Study Validation Dashboard */}
-              <StudyValidationPanel
-                studyId={id}
-                onDocumentClick={(documentId) => {
-                  setSelectedDocumentId(documentId);
-                }}
-              />
-
-              {/* Study Metadata */}
-              <Card>
-                <CardContent className="pt-4">
-                  <dl className="space-y-2 text-sm">
-                    <div>
-                      <dt className="text-muted-foreground">Study ID</dt>
-                      <dd className="font-medium text-foreground">{study.studyId}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Sponsor</dt>
-                      <dd className="font-medium text-foreground">{study.sponsor}</dd>
-                    </div>
-                    {study.therapeuticArea && (
-                      <div>
-                        <dt className="text-muted-foreground">Therapeutic Area</dt>
-                        <dd className="font-medium text-foreground">{study.therapeuticArea}</dd>
-                      </div>
-                    )}
-                    {study.phase && (
-                      <div>
-                        <dt className="text-muted-foreground">Phase</dt>
-                        <dd className="font-medium text-foreground">{study.phase}</dd>
-                      </div>
-                    )}
-                  </dl>
-                </CardContent>
-              </Card>
-
-              {/* Template Info */}
-              {study.activeTemplate && (
+              <div className="space-y-4">
+                {/* Progress */}
                 <Card>
                   <CardContent className="pt-4">
-                    <p className="text-xs text-muted-foreground mb-1">Template</p>
-                    <p className="text-sm font-medium text-foreground">
-                      {study.activeTemplate.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      v{study.activeTemplate.version} | {study.activeTemplate.nodes?.length || 0} sections
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-foreground/80">Progress</span>
+                      <span className="text-sm text-muted-foreground">
+                        {sectionProgress.filled}/{sectionProgress.total}
+                        {sectionProgress.total > 0 && (
+                          <span className="ml-1 text-xs">
+                            ({Math.round((sectionProgress.filled / sectionProgress.total) * 100)}%)
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-success to-primary h-2 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${sectionProgress.total > 0
+                            ? (sectionProgress.filled / sectionProgress.total) * 100
+                            : 0}%`
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {sectionProgress.total - sectionProgress.filled} sections remaining
                     </p>
                   </CardContent>
                 </Card>
-              )}
+
+                {/* Bulk Workflow Actions */}
+                <BulkWorkflowActions studyId={id} documents={documents} />
+
+                {/* Study Validation Dashboard */}
+                <StudyValidationPanel
+                  studyId={id}
+                  onDocumentClick={(documentId) => {
+                    setSelectedDocumentId(documentId);
+                  }}
+                />
+
+                {/* Study Metadata */}
+                <Card>
+                  <CardContent className="pt-4">
+                    <dl className="space-y-2 text-sm">
+                      <div>
+                        <dt className="text-muted-foreground">Study ID</dt>
+                        <dd className="font-medium text-foreground">{study.studyId}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Sponsor</dt>
+                        <dd className="font-medium text-foreground">{study.sponsor}</dd>
+                      </div>
+                      {study.therapeuticArea && (
+                        <div>
+                          <dt className="text-muted-foreground">Therapeutic Area</dt>
+                          <dd className="font-medium text-foreground">{study.therapeuticArea}</dd>
+                        </div>
+                      )}
+                      {study.phase && (
+                        <div>
+                          <dt className="text-muted-foreground">Phase</dt>
+                          <dd className="font-medium text-foreground">{study.phase}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  </CardContent>
+                </Card>
+
+                {/* Template Info */}
+                {study.activeTemplate && (
+                  <Card>
+                    <CardContent className="pt-4">
+                      <p className="text-xs text-muted-foreground mb-1">Template</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {study.activeTemplate.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        v{study.activeTemplate.version} | {study.activeTemplate.nodes?.length || 0} sections
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </aside>
       </div>
 

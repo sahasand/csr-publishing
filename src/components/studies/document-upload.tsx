@@ -13,6 +13,7 @@ import {
   Circle,
 } from 'lucide-react';
 import type { Document } from '@/types';
+import { toast } from 'sonner';
 
 // Only PDF files are allowed
 const ALLOWED_TYPES = ['application/pdf'];
@@ -148,6 +149,7 @@ export function DocumentUpload({
                 });
               } else {
                 updateItem(item.id, { status: 'success', progress: 100 });
+                toast.success(`${item.file.name} uploaded`);
                 onUploadComplete?.(response.data as Document);
               }
             } catch {
@@ -231,7 +233,7 @@ export function DocumentUpload({
       clearTimeoutRef.current = setTimeout(() => {
         clearTimeoutRef.current = null;
         setFileQueue([]);
-      }, 3000);
+      }, 8000);
     }
 
     return () => {
@@ -543,16 +545,29 @@ export function DocumentUpload({
             {/* Summary + Add more */}
             <div className="flex items-center justify-between pt-1 border-t border-border/50">
               {renderSummary()}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBrowseClick}
-                disabled={disabled}
-                className="flex-shrink-0"
-              >
-                <Upload className="h-3 w-3 mr-1" />
-                Add more
-              </Button>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {!isProcessing && fileQueue.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (clearTimeoutRef.current) {
+                        clearTimeout(clearTimeoutRef.current);
+                        clearTimeoutRef.current = null;
+                      }
+                      setFileQueue([]);
+                    }}
+                    className="text-muted-foreground"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Clear
+                  </Button>
+                )}
+                <Button variant="outline" size="sm" onClick={handleBrowseClick} disabled={disabled}>
+                  <Upload className="h-3 w-3 mr-1" />
+                  Add more
+                </Button>
+              </div>
             </div>
           </div>
         )}

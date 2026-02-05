@@ -223,18 +223,19 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
         </div>
 
         {/* Annotation Panel - Right side (collapsible) */}
-        {showAnnotations && (
-          <aside className="w-[320px] flex-shrink-0 border-l border-border bg-muted/40 overflow-hidden">
-            <div className="h-full overflow-y-auto p-4">
-              <AnnotationPanel
-                documentId={documentId}
-                maxPageNumber={totalPages || undefined}
-                onAnnotationClick={handleAnnotationClick}
-                currentUserName="Reviewer"
-              />
-            </div>
-          </aside>
-        )}
+        <aside className={cn(
+          'flex-shrink-0 border-l border-border bg-muted/40 transition-all duration-200 overflow-hidden',
+          showAnnotations ? 'w-[320px]' : 'w-0 border-l-0'
+        )}>
+          <div className="w-[320px] h-full overflow-y-auto p-4">
+            <AnnotationPanel
+              documentId={documentId}
+              maxPageNumber={totalPages || undefined}
+              onAnnotationClick={handleAnnotationClick}
+              currentUserName="Reviewer"
+            />
+          </div>
+        </aside>
       </div>
     </div>
   );

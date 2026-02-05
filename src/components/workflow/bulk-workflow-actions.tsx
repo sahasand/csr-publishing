@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Send, CheckCircle, BookOpen, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useBulkTransition } from '@/hooks/use-bulk-transition';
 import type { DocumentStatusType } from '@/types';
 
@@ -57,7 +58,6 @@ const BULK_ACTIONS: BulkAction[] = [
 
 export function BulkWorkflowActions({ studyId, documents }: BulkWorkflowActionsProps) {
   const [confirmAction, setConfirmAction] = useState<BulkAction | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const mutation = useBulkTransition(studyId);
 
@@ -91,10 +91,9 @@ export function BulkWorkflowActions({ studyId, documents }: BulkWorkflowActionsP
       {
         onSuccess: (result) => {
           setConfirmAction(null);
-          setSuccessMessage(
-            `${result.transitioned} document${result.transitioned !== 1 ? 's' : ''} moved to ${result.toStatus.replace(/_/g, ' ').toLowerCase()}.`
+          toast.success(
+            `${result.transitioned} document${result.transitioned !== 1 ? 's' : ''} moved to ${result.toStatus.replace(/_/g, ' ').toLowerCase()}`
           );
-          setTimeout(() => setSuccessMessage(null), 3000);
         },
       }
     );
@@ -121,9 +120,6 @@ export function BulkWorkflowActions({ studyId, documents }: BulkWorkflowActionsP
           </p>
         ) : (
           <div className="space-y-2">
-            {successMessage && (
-              <p className="text-xs text-success font-medium">{successMessage}</p>
-            )}
             {actionsWithCounts.map((action) => {
               const Icon = action.icon;
               return (

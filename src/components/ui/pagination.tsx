@@ -8,16 +8,22 @@ interface PaginationProps {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  total?: number;
+  pageSize?: number;
   className?: string;
 }
 
-export function Pagination({ page, totalPages, onPageChange, className }: PaginationProps) {
+export function Pagination({ page, totalPages, onPageChange, total, pageSize, className }: PaginationProps) {
   if (totalPages <= 1) return null;
+
+  const showingText = total != null && pageSize
+    ? `Showing ${(page - 1) * pageSize + 1}\u2013${Math.min(page * pageSize, total)} of ${total}`
+    : `Page ${page} of ${totalPages}`;
 
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <span className="text-sm text-muted-foreground">
-        Page {page} of {totalPages}
+        {showingText}
       </span>
       <div className="flex items-center gap-2">
         <Button

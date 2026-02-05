@@ -21,6 +21,7 @@ import {
   RotateCcw,
   Loader2,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { WORKFLOW_TRANSITIONS, type DocumentStatusType } from '@/types';
 
 interface WorkflowActionsProps {
@@ -92,7 +93,8 @@ export function WorkflowActions({
   const mutation = useMutation({
     mutationFn: ({ toStatus, comment }: { toStatus: DocumentStatusType; comment?: string }) =>
       transitionDocument(documentId, toStatus, comment),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      toast.success(`Status changed to ${variables.toStatus.replace(/_/g, ' ').toLowerCase()}`);
       queryClient.invalidateQueries({ queryKey: ['document', documentId] });
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       setCommentDialogOpen(false);
