@@ -1,6 +1,5 @@
-import { Prisma, PrismaClient, ValidationCategory, ValidationSeverity } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Prisma, ValidationCategory, ValidationSeverity } from '../src/generated/prisma/client';
+import { db } from '../src/lib/db';
 
 interface SeedValidationRule {
   name: string;
@@ -135,18 +134,18 @@ async function seedValidationRules() {
 
   for (const rule of defaultValidationRules) {
     // Use upsert to avoid duplicates based on name
-    const existingRule = await prisma.validationRule.findFirst({
+    const existingRule = await db.validationRule.findFirst({
       where: { name: rule.name },
     });
 
     if (existingRule) {
       console.log(`  Validation rule "${rule.name}" already exists, updating...`);
-      await prisma.validationRule.update({
+      await db.validationRule.update({
         where: { id: existingRule.id },
         data: {
           category: rule.category,
           checkFn: rule.checkFn,
-          params: rule.params,
+          params: JSON.stringify(rule.params),
           severity: rule.severity,
           autoFix: rule.autoFix,
           message: rule.message,
@@ -155,12 +154,12 @@ async function seedValidationRules() {
       });
     } else {
       console.log(`  Creating validation rule "${rule.name}"...`);
-      await prisma.validationRule.create({
+      await db.validationRule.create({
         data: {
           name: rule.name,
           category: rule.category,
           checkFn: rule.checkFn,
-          params: rule.params,
+          params: JSON.stringify(rule.params),
           severity: rule.severity,
           autoFix: rule.autoFix,
           message: rule.message,
@@ -180,7 +179,7 @@ async function main() {
     console.error('Error seeding validation rules:', error);
     process.exit(1);
   } finally {
-    await prisma.$disconnect();
+    await db.$disconnect();
   }
 }
 

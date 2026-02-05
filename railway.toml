@@ -13,3 +13,4 @@ restartPolicyMaxRetries = 3
 # - Volume mount path: /data
 # - DATABASE_URL: file:/data/csr.db
 # - UPLOAD_DIR: /data/uploads
+# - EXPORTS_DIR: /data/exports
