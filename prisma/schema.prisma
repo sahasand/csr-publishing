@@ -298,7 +298,6 @@ model ProcessingJob {
 }
 
 enum JobType {
-  PDF_CONVERSION
   PDF_VALIDATION
   METADATA_EXTRACTION
   PACKAGE_EXPORT

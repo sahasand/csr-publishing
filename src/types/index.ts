@@ -127,7 +127,7 @@ export interface UpdateDocumentInput {
 
 // Processing job types
 export type JobStatus = 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
-export type JobType = 'PDF_CONVERSION' | 'PDF_VALIDATION' | 'METADATA_EXTRACTION' | 'PACKAGE_EXPORT';
+export type JobType = 'PDF_VALIDATION' | 'METADATA_EXTRACTION' | 'PACKAGE_EXPORT';
 
 export interface LatestProcessingJob {
   id: string;

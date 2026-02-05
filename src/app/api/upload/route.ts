@@ -3,14 +3,7 @@ import { saveFile } from '@/lib/storage';
 import { db } from '@/lib/db';
 import { processDocumentWithTracking } from '@/lib/process-document';
 
-const ALLOWED_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'text/plain',
-  'text/csv',
-  'application/rtf',
-];
+const ALLOWED_TYPES = ['application/pdf'];
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
@@ -32,10 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    if (!ALLOWED_TYPES.includes(file.type) && !file.name.endsWith('.xpt')) {
+    // Validate file type - only PDFs allowed
+    if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: `File type not allowed: ${file.type}` },
+        { error: 'Only PDF files are accepted' },
         { status: 400 }
       );
     }

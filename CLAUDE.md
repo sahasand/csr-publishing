@@ -19,6 +19,7 @@ CSR Publishing - A clinical study report (CSR) document management and eCTD pack
 
 - **SQLite**: Single-file database for simplicity (small team internal tool)
 - **Direct processing**: Document metadata extraction happens synchronously during upload (no job queue)
+- **PDF-only uploads**: Only PDF files are accepted; no document conversion (keeps deployment simple)
 - **Prisma 7**: Uses `@prisma/adapter-better-sqlite3` driver adapter
 - **JSON as strings**: SQLite doesn't support JSON type natively; `params` and `validationRules` are stored as JSON strings
 
@@ -123,20 +124,6 @@ NODE_ENV=production
 1. `railway login && railway init && railway up`
 2. Add persistent volume mounted at `/data`
 3. Set environment variables in Railway dashboard
-
-## Document Conversion (Optional)
-
-The app supports converting Word docs (.doc, .docx, .rtf, .odt) to PDF via LibreOffice (`src/lib/jobs/pdf-conversion.ts`).
-
-**Local testing:** Install LibreOffice (`brew install --cask libreoffice` on macOS)
-
-**Production:** Adds 500MB+ to image. For Railway, add `nixpacks.toml`:
-```toml
-[phases.setup]
-nixPkgs = ["libreoffice"]
-```
-
-**Recommendation:** Skip conversion for now. Most users upload PDFs directly. Add later if needed.
 
 ## ICH E3 Standard Sections
 

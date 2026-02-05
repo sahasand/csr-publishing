@@ -50,20 +50,6 @@ export async function processDocument(
         break;
       }
 
-      case 'PDF_CONVERSION': {
-        const { convertDocument } = await import('./jobs/pdf-conversion');
-        const conversionResult = await convertDocument(documentId, filePath);
-        result = {
-          success: conversionResult.success,
-          data: {
-            documentId,
-            outputPath: conversionResult.outputPath,
-          },
-          error: conversionResult.error,
-        };
-        break;
-      }
-
       default:
         throw new Error(`Unknown job type: ${jobType}`);
     }

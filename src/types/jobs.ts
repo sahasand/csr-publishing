@@ -2,7 +2,7 @@
  * Job type definitions for document processing pipeline
  */
 
-export type JobType = 'PDF_VALIDATION' | 'METADATA_EXTRACTION' | 'PDF_CONVERSION';
+export type JobType = 'PDF_VALIDATION' | 'METADATA_EXTRACTION';
 
 /**
  * Data passed to document processing jobs
@@ -46,15 +46,6 @@ export interface MetadataExtractionResultData {
   modificationDate?: string;
   producer?: string;
   creator?: string;
-}
-
-/**
- * PDF conversion specific result data
- */
-export interface PDFConversionResultData {
-  outputPath: string;
-  convertedAt: string;
-  conversionType: string;
 }
 
 /**

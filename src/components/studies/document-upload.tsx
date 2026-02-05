@@ -6,28 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Upload, X, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import type { Document } from '@/types';
 
-// Allowed file types matching the API validation
-const ALLOWED_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'text/plain',
-  'text/csv',
-  'application/rtf',
-];
-
-const ALLOWED_EXTENSIONS = ['.xpt'];
+// Only PDF files are allowed
+const ALLOWED_TYPES = ['application/pdf'];
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
 // Human-readable file type descriptions
 const FILE_TYPE_LABELS: Record<string, string> = {
   'application/pdf': 'PDF',
-  'application/msword': 'Word (.doc)',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word (.docx)',
-  'text/plain': 'Text',
-  'text/csv': 'CSV',
-  'application/rtf': 'RTF',
 };
 
 export interface DocumentUploadProps {
@@ -58,21 +44,14 @@ function validateFile(file: File): { valid: boolean; error?: string } {
     };
   }
 
-  // Check if file type is in allowed MIME types
+  // Check if file type is PDF
   if (ALLOWED_TYPES.includes(file.type)) {
     return { valid: true };
   }
 
-  // Check for .xpt extension (datasets)
-  if (file.name.toLowerCase().endsWith('.xpt')) {
-    return { valid: true };
-  }
-
-  // Build helpful error message
-  const allowedLabels = Object.values(FILE_TYPE_LABELS).join(', ');
   return {
     valid: false,
-    error: `File type not allowed. Accepted types: ${allowedLabels}, .xpt (datasets)`,
+    error: 'Only PDF files are accepted',
   };
 }
 
@@ -80,7 +59,7 @@ function validateFile(file: File): { valid: boolean; error?: string } {
  * Gets the accept string for the file input
  */
 function getAcceptString(): string {
-  return [...ALLOWED_TYPES, '.xpt'].join(',');
+  return ALLOWED_TYPES.join(',');
 }
 
 export function DocumentUpload({
@@ -406,7 +385,7 @@ export function DocumentUpload({
                 </button>
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                PDF, Word, RTF, CSV, TXT, XPT up to {formatBytes(MAX_FILE_SIZE)}
+                PDF files up to {formatBytes(MAX_FILE_SIZE)}
               </p>
             </div>
           </>
