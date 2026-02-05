@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTemplates, useDeleteTemplate } from '@/hooks/use-templates';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SkeletonList } from '@/components/ui/skeleton';
 import {
   Card,
   CardContent,
@@ -12,7 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils';
-import { Trash2, ExternalLink, Loader2, Star } from 'lucide-react';
+import { Trash2, ExternalLink, Star } from 'lucide-react';
 
 export function TemplateList() {
   const { data: templates, isLoading, error } = useTemplates();
@@ -20,9 +21,7 @@ export function TemplateList() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
-      </div>
+      <SkeletonList count={3} />
     );
   }
 

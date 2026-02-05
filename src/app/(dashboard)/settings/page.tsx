@@ -159,7 +159,7 @@ export default function SettingsPage() {
                         </div>
                       </>
                     ) : (
-                      <p className="text-muted-foreground">No default template set</p>
+                      <p className="text-foreground/70">No default template set</p>
                     )}
                   </div>
                   <Link href="/templates">
@@ -172,7 +172,7 @@ export default function SettingsPage() {
 
                 {!defaultTemplate && templates.length > 0 && (
                   <div className="border-t pt-4">
-                    <p className="text-sm text-muted-foreground mb-3">Select a default template:</p>
+                    <p className="text-sm text-foreground/70 mb-3">Select a default template:</p>
                     <div className="space-y-2">
                       {templates.slice(0, 5).map((template) => (
                         <div

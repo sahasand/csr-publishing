@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton, SkeletonCard } from '@/components/ui/skeleton';
 import {
   FileText,
   FolderTree,
@@ -14,7 +15,6 @@ import {
   Plus,
   Upload,
   Package,
-  Loader2,
 } from 'lucide-react';
 
 interface Study {
@@ -75,8 +75,24 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/70" />
+      <div className="space-y-8">
+        <div>
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} className="h-[110px]" />
+          ))}
+        </div>
+
+        <SkeletonCard className="h-[220px]" />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SkeletonCard className="h-[260px]" />
+          <SkeletonCard className="h-[260px]" />
+        </div>
       </div>
     );
   }

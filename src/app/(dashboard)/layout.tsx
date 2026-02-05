@@ -50,7 +50,7 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <main className="relative flex-1 overflow-auto bg-background">
-        <div className="pointer-events-none absolute inset-0 bg-grid opacity-35" />
+        <div className="pointer-events-none absolute inset-0 bg-grid opacity-20" />
         <div className="pointer-events-none absolute -top-32 -right-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-10 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative p-8">{children}</div>
