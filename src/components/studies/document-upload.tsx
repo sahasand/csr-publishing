@@ -3,18 +3,21 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { cn, formatBytes } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Upload, X, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import {
+  Upload,
+  X,
+  FileText,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  Circle,
+} from 'lucide-react';
 import type { Document } from '@/types';
 
 // Only PDF files are allowed
 const ALLOWED_TYPES = ['application/pdf'];
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-
-// Human-readable file type descriptions
-const FILE_TYPE_LABELS: Record<string, string> = {
-  'application/pdf': 'PDF',
-};
 
 export interface DocumentUploadProps {
   studyId: string;
@@ -23,20 +26,18 @@ export interface DocumentUploadProps {
   disabled?: boolean;
 }
 
-type UploadStatus = 'idle' | 'validating' | 'uploading' | 'success' | 'error';
-
-interface UploadState {
-  status: UploadStatus;
+interface FileUploadItem {
+  id: string;
+  file: File;
+  status: 'pending' | 'uploading' | 'success' | 'error';
   progress: number;
   error: string | null;
-  file: File | null;
 }
 
 /**
  * Validates a file against allowed types and size limits
  */
 function validateFile(file: File): { valid: boolean; error?: string } {
-  // Check file size
   if (file.size > MAX_FILE_SIZE) {
     return {
       valid: false,
@@ -44,7 +45,6 @@ function validateFile(file: File): { valid: boolean; error?: string } {
     };
   }
 
-  // Check if file type is PDF
   if (ALLOWED_TYPES.includes(file.type)) {
     return { valid: true };
   }
@@ -68,175 +68,207 @@ export function DocumentUpload({
   onUploadComplete,
   disabled = false,
 }: DocumentUploadProps) {
-  const [uploadState, setUploadState] = useState<UploadState>({
-    status: 'idle',
-    progress: 0,
-    error: null,
-    file: null,
-  });
+  const [fileQueue, setFileQueue] = useState<FileUploadItem[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const xhrRef = useRef<XMLHttpRequest | null>(null);
-  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref to track whether an upload is currently in progress, preventing
+  // the useEffect from starting duplicate uploads on re-renders.
+  const isUploadingRef = useRef(false);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Abort any in-flight XHR request
       if (xhrRef.current) {
         xhrRef.current.abort();
         xhrRef.current = null;
       }
-      // Clear any pending timeout
-      if (successTimeoutRef.current) {
-        clearTimeout(successTimeoutRef.current);
-        successTimeoutRef.current = null;
+      if (clearTimeoutRef.current) {
+        clearTimeout(clearTimeoutRef.current);
+        clearTimeoutRef.current = null;
       }
     };
   }, []);
 
-  const resetState = useCallback(() => {
-    // Abort any in-flight XHR request
-    if (xhrRef.current) {
-      xhrRef.current.abort();
-      xhrRef.current = null;
-    }
-    // Clear any pending timeout
-    if (successTimeoutRef.current) {
-      clearTimeout(successTimeoutRef.current);
-      successTimeoutRef.current = null;
-    }
-    setUploadState({
-      status: 'idle',
-      progress: 0,
-      error: null,
-      file: null,
-    });
+  /**
+   * Updates a single item in the queue by id.
+   */
+  const updateItem = useCallback(
+    (id: string, updates: Partial<Omit<FileUploadItem, 'id' | 'file'>>) => {
+      setFileQueue((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, ...updates } : item
+        )
+      );
+    },
+    []
+  );
+
+  /**
+   * Removes an item from the queue (only pending or error items).
+   */
+  const removeItem = useCallback((id: string) => {
+    setFileQueue((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
-  const uploadFile = useCallback(
-    async (file: File) => {
-      // Validate file first
-      setUploadState({
-        status: 'validating',
-        progress: 0,
-        error: null,
-        file,
-      });
+  /**
+   * Uploads a single file. Returns a promise that resolves when done.
+   */
+  const uploadSingleFile = useCallback(
+    (item: FileUploadItem): Promise<void> => {
+      return new Promise<void>((resolve) => {
+        updateItem(item.id, { status: 'uploading', progress: 0 });
 
-      const validation = validateFile(file);
-      if (!validation.valid) {
-        setUploadState({
-          status: 'error',
-          progress: 0,
-          error: validation.error || 'Invalid file',
-          file,
-        });
-        return;
-      }
-
-      // Start upload
-      setUploadState({
-        status: 'uploading',
-        progress: 0,
-        error: null,
-        file,
-      });
-
-      try {
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', item.file);
         formData.append('studyId', studyId);
         formData.append('slotId', slotId);
 
-        // Use XMLHttpRequest for progress tracking
         const xhr = new XMLHttpRequest();
         xhrRef.current = xhr;
 
-        const uploadPromise = new Promise<Document>((resolve, reject) => {
-          xhr.upload.addEventListener('progress', (event) => {
-            if (event.lengthComputable) {
-              const progress = Math.round((event.loaded / event.total) * 100);
-              setUploadState((prev) => ({ ...prev, progress }));
-            }
-          });
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            updateItem(item.id, { progress });
+          }
+        });
 
-          xhr.addEventListener('load', () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                const response = JSON.parse(xhr.responseText);
-                if (response.error) {
-                  reject(new Error(response.error));
-                } else {
-                  resolve(response.data as Document);
-                }
-              } catch {
-                reject(new Error('Invalid response from server'));
+        xhr.addEventListener('load', () => {
+          xhrRef.current = null;
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              if (response.error) {
+                updateItem(item.id, {
+                  status: 'error',
+                  progress: 0,
+                  error: response.error,
+                });
+              } else {
+                updateItem(item.id, { status: 'success', progress: 100 });
+                onUploadComplete?.(response.data as Document);
               }
-            } else {
-              try {
-                const response = JSON.parse(xhr.responseText);
-                reject(new Error(response.error || `Upload failed with status ${xhr.status}`));
-              } catch {
-                reject(new Error(`Upload failed with status ${xhr.status}`));
-              }
+            } catch {
+              updateItem(item.id, {
+                status: 'error',
+                progress: 0,
+                error: 'Invalid response from server',
+              });
             }
-          });
-
-          xhr.addEventListener('error', () => {
-            reject(new Error('Network error during upload'));
-          });
-
-          xhr.addEventListener('abort', () => {
-            reject(new Error('Upload was cancelled'));
-          });
-
-          xhr.open('POST', '/api/upload');
-          xhr.send(formData);
+          } else {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              updateItem(item.id, {
+                status: 'error',
+                progress: 0,
+                error: response.error || `Upload failed with status ${xhr.status}`,
+              });
+            } catch {
+              updateItem(item.id, {
+                status: 'error',
+                progress: 0,
+                error: `Upload failed with status ${xhr.status}`,
+              });
+            }
+          }
+          resolve();
         });
 
-        const document = await uploadPromise;
-
-        setUploadState({
-          status: 'success',
-          progress: 100,
-          error: null,
-          file,
+        xhr.addEventListener('error', () => {
+          xhrRef.current = null;
+          updateItem(item.id, {
+            status: 'error',
+            progress: 0,
+            error: 'Network error during upload',
+          });
+          resolve();
         });
 
-        // Clear the XHR reference as upload completed
-        xhrRef.current = null;
-
-        // Call the success callback
-        onUploadComplete?.(document);
-
-        // Reset state after a brief delay to show success message
-        successTimeoutRef.current = setTimeout(() => {
-          successTimeoutRef.current = null;
-          resetState();
-        }, 2000);
-      } catch (error) {
-        setUploadState({
-          status: 'error',
-          progress: 0,
-          error: error instanceof Error ? error.message : 'Upload failed',
-          file,
+        xhr.addEventListener('abort', () => {
+          xhrRef.current = null;
+          updateItem(item.id, {
+            status: 'error',
+            progress: 0,
+            error: 'Upload was cancelled',
+          });
+          resolve();
         });
+
+        xhr.open('POST', '/api/upload');
+        xhr.send(formData);
+      });
+    },
+    [studyId, slotId, onUploadComplete, updateItem]
+  );
+
+  // Queue processor: pick up the next pending item when nothing is uploading
+  useEffect(() => {
+    if (isUploadingRef.current) return;
+
+    const hasUploading = fileQueue.some((item) => item.status === 'uploading');
+    if (hasUploading) return;
+
+    const nextPending = fileQueue.find((item) => item.status === 'pending');
+    if (!nextPending) return;
+
+    isUploadingRef.current = true;
+    uploadSingleFile(nextPending).then(() => {
+      isUploadingRef.current = false;
+    });
+  }, [fileQueue, uploadSingleFile]);
+
+  // Auto-clear: when all items are terminal (success or error), clear after 3 seconds
+  useEffect(() => {
+    if (fileQueue.length === 0) return;
+
+    const allDone = fileQueue.every(
+      (item) => item.status === 'success' || item.status === 'error'
+    );
+
+    if (allDone) {
+      clearTimeoutRef.current = setTimeout(() => {
+        clearTimeoutRef.current = null;
+        setFileQueue([]);
+      }, 3000);
+    }
+
+    return () => {
+      if (clearTimeoutRef.current) {
+        clearTimeout(clearTimeoutRef.current);
+        clearTimeoutRef.current = null;
       }
-    },
-    [studyId, slotId, onUploadComplete, resetState]
-  );
+    };
+  }, [fileQueue]);
 
-  const handleFiles = useCallback(
-    (files: FileList | null) => {
-      if (!files || files.length === 0) return;
+  /**
+   * Accepts multiple files, validates each, and adds them to the queue.
+   */
+  const handleFiles = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return;
 
-      // Only handle the first file
-      const file = files[0];
-      uploadFile(file);
-    },
-    [uploadFile]
-  );
+    // Cancel any pending auto-clear timeout when new files arrive
+    if (clearTimeoutRef.current) {
+      clearTimeout(clearTimeoutRef.current);
+      clearTimeoutRef.current = null;
+    }
+
+    const newItems: FileUploadItem[] = Array.from(files).map((file) => {
+      const validation = validateFile(file);
+      return {
+        id: crypto.randomUUID(),
+        file,
+        status: validation.valid ? 'pending' : 'error',
+        progress: 0,
+        error: validation.valid ? null : (validation.error ?? 'Invalid file'),
+      } as FileUploadItem;
+    });
+
+    setFileQueue((prev) => [...prev, ...newItems]);
+  }, []);
+
+  // --- Drag-and-drop handlers (unchanged logic) ---
 
   const handleDragEnter = useCallback(
     (e: React.DragEvent) => {
@@ -295,27 +327,72 @@ export function DocumentUpload({
     fileInputRef.current?.click();
   }, []);
 
-  const handleCancelClick = useCallback(() => {
-    resetState();
-  }, [resetState]);
-
-  const isUploading = uploadState.status === 'uploading' || uploadState.status === 'validating';
-  const isDisabled = disabled || isUploading;
-
-  // Get status text for screen reader announcements
-  const getStatusText = (): string => {
-    switch (uploadState.status) {
-      case 'validating':
-        return 'Validating file...';
-      case 'uploading':
-        return `Uploading ${uploadState.file?.name ?? 'file'}: ${uploadState.progress}% complete`;
-      case 'success':
-        return `Upload complete: ${uploadState.file?.name ?? 'file'}`;
-      case 'error':
-        return `Upload failed: ${uploadState.error ?? 'Unknown error'}`;
-      default:
-        return '';
+  const handleCancelUpload = useCallback(() => {
+    if (xhrRef.current) {
+      xhrRef.current.abort();
+      xhrRef.current = null;
     }
+  }, []);
+
+  // --- Computed values for summary ---
+
+  const totalCount = fileQueue.length;
+  const successCount = fileQueue.filter((i) => i.status === 'success').length;
+  const errorCount = fileQueue.filter((i) => i.status === 'error').length;
+  const uploadingItem = fileQueue.find((i) => i.status === 'uploading');
+  const pendingCount = fileQueue.filter((i) => i.status === 'pending').length;
+  const completedCount = successCount + errorCount;
+  const isProcessing = !!uploadingItem || pendingCount > 0;
+
+  // --- Screen reader announcement ---
+
+  const getStatusText = (): string => {
+    if (fileQueue.length === 0) return '';
+    if (uploadingItem) {
+      return `Uploading ${uploadingItem.file.name}: ${uploadingItem.progress}% complete. ${completedCount} of ${totalCount} files processed.`;
+    }
+    if (pendingCount > 0) {
+      return `${pendingCount} files waiting to upload.`;
+    }
+    return `All uploads complete. ${successCount} succeeded, ${errorCount} failed.`;
+  };
+
+  // --- Status icon per item ---
+
+  const renderStatusIcon = (item: FileUploadItem) => {
+    switch (item.status) {
+      case 'pending':
+        return <Circle className="h-4 w-4 text-muted-foreground flex-shrink-0" />;
+      case 'uploading':
+        return <Loader2 className="h-4 w-4 text-primary animate-spin flex-shrink-0" />;
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />;
+      case 'error':
+        return <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />;
+    }
+  };
+
+  // --- Summary text ---
+
+  const renderSummary = () => {
+    if (isProcessing) {
+      const uploadingIndex = fileQueue.findIndex(
+        (i) => i.status === 'uploading'
+      );
+      const currentNum = uploadingIndex >= 0 ? uploadingIndex + 1 : completedCount + 1;
+      return (
+        <span className="text-sm text-muted-foreground">
+          Uploading {currentNum} of {totalCount}...
+        </span>
+      );
+    }
+    // All done
+    const parts: string[] = [];
+    if (successCount > 0) parts.push(`${successCount} uploaded`);
+    if (errorCount > 0) parts.push(`${errorCount} failed`);
+    return (
+      <span className="text-sm text-muted-foreground">{parts.join(', ')}</span>
+    );
   };
 
   return (
@@ -330,34 +407,34 @@ export function DocumentUpload({
         {getStatusText()}
       </div>
 
-      {/* Hidden file input */}
+      {/* Hidden file input (multiple) */}
       <input
         ref={fileInputRef}
         type="file"
         className="hidden"
         accept={getAcceptString()}
         onChange={handleFileInputChange}
-        disabled={isDisabled}
+        disabled={disabled}
+        multiple
       />
 
-      {/* Drop zone */}
+      {/* Drop zone - always present for drag-and-drop */}
       <div
         className={cn(
-          'relative border-2 border-dashed rounded-lg p-6 transition-colors',
-          'flex flex-col items-center justify-center gap-3 min-h-[160px]',
+          'relative border-2 border-dashed rounded-lg transition-colors',
           isDragOver && !disabled && 'border-primary bg-primary/10',
           !isDragOver && !disabled && 'border-border hover:border-border/70 bg-muted/40',
           disabled && 'border-border bg-muted cursor-not-allowed opacity-60',
-          uploadState.status === 'error' && 'border-destructive/40 bg-destructive/10',
-          uploadState.status === 'success' && 'border-success/40 bg-success/10'
+          fileQueue.length === 0 && 'p-6 flex flex-col items-center justify-center gap-3 min-h-[160px]',
+          fileQueue.length > 0 && 'p-4'
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        {/* Idle state */}
-        {uploadState.status === 'idle' && (
+        {/* Idle state: no files in queue */}
+        {fileQueue.length === 0 && (
           <>
             <div
               className={cn(
@@ -374,11 +451,11 @@ export function DocumentUpload({
             </div>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                <span className="font-medium">Drop a file here</span> or{' '}
+                <span className="font-medium">Drop files here</span> or{' '}
                 <button
                   type="button"
                   onClick={handleBrowseClick}
-                  disabled={isDisabled}
+                  disabled={disabled}
                   className="text-primary hover:text-primary font-medium focus:outline-none focus:underline disabled:opacity-50"
                 >
                   browse
@@ -391,98 +468,93 @@ export function DocumentUpload({
           </>
         )}
 
-        {/* Validating state */}
-        {uploadState.status === 'validating' && (
-          <>
-            <div className="p-3 rounded-full bg-muted animate-pulse">
-              <FileText className="h-6 w-6 text-muted-foreground/70" />
-            </div>
-            <p className="text-sm text-muted-foreground">Validating file...</p>
-          </>
-        )}
+        {/* Queue state: files are present */}
+        {fileQueue.length > 0 && (
+          <div className="space-y-3">
+            {/* File list */}
+            <ul className="space-y-2" role="list" aria-label="Upload queue">
+              {fileQueue.map((item) => (
+                <li key={item.id} className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    {renderStatusIcon(item)}
+                    <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-sm text-foreground/80 truncate flex-1 min-w-0">
+                      {item.file.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
+                      {formatBytes(item.file.size)}
+                    </span>
+                    {/* Remove button for pending or error items */}
+                    {(item.status === 'pending' || item.status === 'error') && (
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.id)}
+                        className="p-0.5 text-muted-foreground hover:text-foreground/80 focus:outline-none focus:ring-1 focus:ring-ring rounded"
+                        aria-label={`Remove ${item.file.name}`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {/* Cancel button for the currently uploading item */}
+                    {item.status === 'uploading' && (
+                      <button
+                        type="button"
+                        onClick={handleCancelUpload}
+                        className="text-xs text-muted-foreground hover:text-foreground/80 focus:outline-none focus:ring-1 focus:ring-ring rounded px-1"
+                        aria-label={`Cancel upload of ${item.file.name}`}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
 
-        {/* Uploading state */}
-        {uploadState.status === 'uploading' && uploadState.file && (
-          <>
-            <div className="w-full max-w-xs">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="h-4 w-4 text-primary flex-shrink-0" />
-                <span className="text-sm text-foreground/80 truncate">
-                  {uploadState.file.name}
-                </span>
-                <span className="text-xs text-muted-foreground flex-shrink-0">
-                  {formatBytes(uploadState.file.size)}
-                </span>
-              </div>
-              {/* Progress bar */}
-              <div
-                className="w-full bg-muted/60 rounded-full h-2 overflow-hidden"
-                role="progressbar"
-                aria-valuenow={uploadState.progress}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`Upload progress: ${uploadState.progress}%`}
+                  {/* Progress bar for uploading item */}
+                  {item.status === 'uploading' && (
+                    <div className="ml-[52px]">
+                      <div
+                        className="w-full bg-muted/60 rounded-full h-1.5 overflow-hidden"
+                        role="progressbar"
+                        aria-valuenow={item.progress}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={`Upload progress for ${item.file.name}: ${item.progress}%`}
+                      >
+                        <div
+                          className="bg-primary h-1.5 rounded-full transition-all duration-300 ease-out"
+                          style={{ width: `${item.progress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground mt-0.5 block">
+                        {item.progress}%
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Error message */}
+                  {item.status === 'error' && item.error && (
+                    <p className="text-xs text-destructive ml-[52px]">
+                      {item.error}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* Summary + Add more */}
+            <div className="flex items-center justify-between pt-1 border-t border-border/50">
+              {renderSummary()}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBrowseClick}
+                disabled={disabled}
+                className="flex-shrink-0"
               >
-                <div
-                  className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${uploadState.progress}%` }}
-                />
-              </div>
-              <div className="flex justify-between mt-1">
-                <span className="text-xs text-muted-foreground">
-                  {uploadState.progress}% uploaded
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCancelClick}
-                  className="text-xs text-muted-foreground hover:text-foreground/80 focus:outline-none"
-                >
-                  Cancel
-                </button>
-              </div>
+                <Upload className="h-3 w-3 mr-1" />
+                Add more
+              </Button>
             </div>
-          </>
-        )}
-
-        {/* Success state */}
-        {uploadState.status === 'success' && uploadState.file && (
-          <>
-            <div className="p-3 rounded-full bg-success/10">
-              <CheckCircle className="h-6 w-6 text-success" />
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-success font-medium">
-                Upload complete!
-              </p>
-              <p className="text-xs text-success mt-1">
-                {uploadState.file.name}
-              </p>
-            </div>
-          </>
-        )}
-
-        {/* Error state */}
-        {uploadState.status === 'error' && (
-          <>
-            <div className="p-3 rounded-full bg-destructive/10">
-              <AlertCircle className="h-6 w-6 text-destructive" />
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-destructive font-medium">Upload failed</p>
-              <p className="text-xs text-destructive mt-1 max-w-xs">
-                {uploadState.error}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetState}
-              className="mt-2"
-            >
-              <X className="h-3 w-3 mr-1" />
-              Try again
-            </Button>
-          </>
+          </div>
         )}
       </div>
     </div>

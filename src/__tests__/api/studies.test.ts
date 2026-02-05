@@ -10,6 +10,7 @@ vi.mock('@/lib/db', () => ({
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
   },
 }));
@@ -37,21 +38,27 @@ describe('Studies API', () => {
       ];
 
       vi.mocked(db.study.findMany).mockResolvedValue(mockStudies);
+      (db.study as any).count = vi.fn().mockResolvedValue(1);
 
-      const response = await GET();
+      const request = new NextRequest('http://localhost:3000/api/studies');
+      const response = await GET(request);
       const json = await response.json();
 
       expect(response.status).toBe(200);
       expect(json.data).toHaveLength(1);
       expect(json.data[0].studyId).toBe('TEST-001');
       expect(json.data[0].sponsor).toBe('Test Pharma');
+      expect(json.pagination).toBeDefined();
+      expect(json.pagination.page).toBe(1);
+      expect(json.pagination.total).toBe(1);
       expect(db.study.findMany).toHaveBeenCalledOnce();
     });
 
     it('handles database errors', async () => {
       vi.mocked(db.study.findMany).mockRejectedValue(new Error('DB error'));
 
-      const response = await GET();
+      const request = new NextRequest('http://localhost:3000/api/studies');
+      const response = await GET(request);
       const json = await response.json();
 
       expect(response.status).toBe(500);

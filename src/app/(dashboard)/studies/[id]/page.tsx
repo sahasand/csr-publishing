@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import type { StructureNode, Document } from '@/types';
 import { StudyValidationPanel } from '@/components/studies/study-validation-panel';
+import { BulkWorkflowActions } from '@/components/workflow';
 
 interface Template {
   id: string;
@@ -621,6 +622,9 @@ export default function StudyWorkspacePage() {
                   </p>
                 </CardContent>
               </Card>
+
+              {/* Bulk Workflow Actions */}
+              <BulkWorkflowActions studyId={id} documents={documents} />
 
               {/* Study Validation Dashboard */}
               <StudyValidationPanel

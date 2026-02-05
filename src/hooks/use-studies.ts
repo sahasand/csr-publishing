@@ -1,11 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { StudyWithTemplate, CreateStudyInput, UpdateStudyInput } from '@/types';
+import type { StudyWithTemplate, CreateStudyInput, UpdateStudyInput, PaginatedResponse } from '@/types';
 
-async function fetchStudies(): Promise<StudyWithTemplate[]> {
-  const res = await fetch('/api/studies');
+interface UseStudiesOptions {
+  page?: number;
+  pageSize?: number;
+}
+
+async function fetchStudies(options: UseStudiesOptions = {}): Promise<PaginatedResponse<StudyWithTemplate>> {
+  const params = new URLSearchParams();
+  if (options.page) params.set('page', String(options.page));
+  if (options.pageSize) params.set('pageSize', String(options.pageSize));
+  const query = params.toString();
+  const res = await fetch(`/api/studies${query ? `?${query}` : ''}`);
   const json = await res.json();
   if (!res.ok) throw new Error(json.error);
-  return json.data;
+  return { data: json.data, pagination: json.pagination };
 }
 
 async function fetchStudy(id: string): Promise<StudyWithTemplate> {
@@ -51,10 +60,11 @@ async function deleteStudy(id: string): Promise<void> {
   }
 }
 
-export function useStudies() {
+export function useStudies(options: UseStudiesOptions = {}) {
+  const { page, pageSize } = options;
   return useQuery({
-    queryKey: ['studies'],
-    queryFn: fetchStudies,
+    queryKey: ['studies', { page, pageSize }],
+    queryFn: () => fetchStudies({ page, pageSize }),
   });
 }
 

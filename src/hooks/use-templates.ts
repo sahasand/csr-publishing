@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { StructureTemplate, StructureNode } from '@/types';
+import type { StructureTemplate, StructureNode, PaginatedResponse } from '@/types';
 
 interface TemplateWithCounts extends StructureTemplate {
   _count?: {
@@ -12,11 +12,20 @@ interface TemplateWithNodes extends StructureTemplate {
   nodes: StructureNode[];
 }
 
-async function fetchTemplates(): Promise<TemplateWithCounts[]> {
-  const res = await fetch('/api/templates');
+interface UseTemplatesOptions {
+  page?: number;
+  pageSize?: number;
+}
+
+async function fetchTemplates(options: UseTemplatesOptions = {}): Promise<PaginatedResponse<TemplateWithCounts>> {
+  const params = new URLSearchParams();
+  if (options.page) params.set('page', String(options.page));
+  if (options.pageSize) params.set('pageSize', String(options.pageSize));
+  const query = params.toString();
+  const res = await fetch(`/api/templates${query ? `?${query}` : ''}`);
   const json = await res.json();
   if (!res.ok) throw new Error(json.error);
-  return json.data;
+  return { data: json.data, pagination: json.pagination };
 }
 
 async function fetchTemplate(id: string): Promise<TemplateWithNodes> {
@@ -56,10 +65,11 @@ async function deleteTemplate(id: string): Promise<void> {
   }
 }
 
-export function useTemplates() {
+export function useTemplates(options: UseTemplatesOptions = {}) {
+  const { page, pageSize } = options;
   return useQuery({
-    queryKey: ['templates'],
-    queryFn: fetchTemplates,
+    queryKey: ['templates', { page, pageSize }],
+    queryFn: () => fetchTemplates({ page, pageSize }),
   });
 }
 

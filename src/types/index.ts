@@ -364,6 +364,33 @@ export interface DocumentWithHistory extends Document {
   statusHistory?: DocumentStatusHistory[];
 }
 
+// Pagination types
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: PaginationMeta;
+}
+
+// Bulk workflow transition types
+export interface BulkTransitionInput {
+  toStatus: DocumentStatusType;
+  fromStatuses: DocumentStatusType[];
+  comment?: string;
+  userName?: string;
+}
+
+export interface BulkTransitionResult {
+  transitioned: number;
+  toStatus: DocumentStatusType;
+  documentIds: string[];
+}
+
 // Valid workflow transitions
 export const WORKFLOW_TRANSITIONS: Record<DocumentStatusType, DocumentStatusType[]> = {
   DRAFT: ['IN_REVIEW'],

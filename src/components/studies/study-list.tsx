@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useStudies, useDeleteStudy } from '@/hooks/use-studies';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SkeletonList } from '@/components/ui/skeleton';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Card,
   CardContent,
@@ -16,7 +18,10 @@ import { formatDate } from '@/lib/utils';
 import { Trash2, ExternalLink } from 'lucide-react';
 
 export function StudyList() {
-  const { data: studies, isLoading, error } = useStudies();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, error } = useStudies({ page, pageSize: 20 });
+  const studies = data?.data;
+  const pagination = data?.pagination;
   const deleteStudy = useDeleteStudy();
 
   if (isLoading) {
@@ -101,6 +106,13 @@ export function StudyList() {
           </CardContent>
         </Card>
       ))}
+      {pagination && (
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }

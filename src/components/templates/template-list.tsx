@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useTemplates, useDeleteTemplate } from '@/hooks/use-templates';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SkeletonList } from '@/components/ui/skeleton';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Card,
   CardContent,
@@ -16,7 +18,10 @@ import { formatDate } from '@/lib/utils';
 import { Trash2, ExternalLink, Star } from 'lucide-react';
 
 export function TemplateList() {
-  const { data: templates, isLoading, error } = useTemplates();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, error } = useTemplates({ page, pageSize: 20 });
+  const templates = data?.data;
+  const pagination = data?.pagination;
   const deleteTemplate = useDeleteTemplate();
 
   if (isLoading) {
@@ -99,6 +104,13 @@ export function TemplateList() {
           </CardContent>
         </Card>
       ))}
+      {pagination && (
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }
