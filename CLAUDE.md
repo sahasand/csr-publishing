@@ -106,11 +106,37 @@ npm run test -- src/__tests__/api/studies.test.ts
 
 ## Deployment (Railway)
 
-Requires persistent volume at `/data`:
+Configured via `railway.toml`. Requires persistent volume at `/data`.
+
+**Environment variables:**
 ```env
 DATABASE_URL=file:/data/csr.db
 UPLOAD_DIR=/data/uploads
+EXPORTS_DIR=/data/exports
+NODE_ENV=production
 ```
+
+**Build command:** `prisma generate && next build`
+**Start command:** `prisma migrate deploy && npm start`
+
+**Deploy steps:**
+1. `railway login && railway init && railway up`
+2. Add persistent volume mounted at `/data`
+3. Set environment variables in Railway dashboard
+
+## Document Conversion (Optional)
+
+The app supports converting Word docs (.doc, .docx, .rtf, .odt) to PDF via LibreOffice (`src/lib/jobs/pdf-conversion.ts`).
+
+**Local testing:** Install LibreOffice (`brew install --cask libreoffice` on macOS)
+
+**Production:** Adds 500MB+ to image. For Railway, add `nixpacks.toml`:
+```toml
+[phases.setup]
+nixPkgs = ["libreoffice"]
+```
+
+**Recommendation:** Skip conversion for now. Most users upload PDFs directly. Add later if needed.
 
 ## ICH E3 Standard Sections
 
