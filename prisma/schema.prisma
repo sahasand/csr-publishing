@@ -115,6 +115,7 @@ model Document {
   validationResults  ValidationResult[]
   checklistResponse  ChecklistResponse?
   processingJobs     ProcessingJob[]
+  statusHistory      DocumentStatusHistory[]
 
   @@unique([studyId, slotId, version])
   @@index([studyId])
@@ -132,6 +133,24 @@ enum DocumentStatus {
   CORRECTIONS_NEEDED
   APPROVED
   PUBLISHED
+}
+
+// ============ DOCUMENT STATUS HISTORY ============
+
+model DocumentStatusHistory {
+  id          String         @id @default(uuid())
+  documentId  String
+  fromStatus  DocumentStatus
+  toStatus    DocumentStatus
+  userId      String?
+  userName    String         @default("System")
+  comment     String?
+  createdAt   DateTime       @default(now())
+
+  document    Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([createdAt])
 }
 
 // ============ ANNOTATIONS ============
