@@ -11,6 +11,9 @@ vi.mock('@/lib/db', () => ({
       update: vi.fn(),
       delete: vi.fn(),
     },
+    structureTemplate: {
+      findFirst: vi.fn(),
+    },
   },
 }));
 
@@ -71,6 +74,7 @@ describe('Studies API', () => {
       };
 
       vi.mocked(db.study.findUnique).mockResolvedValue(null);
+      vi.mocked(db.structureTemplate.findFirst).mockResolvedValue(null);
       vi.mocked(db.study.create).mockResolvedValue(newStudy);
 
       const request = new NextRequest('http://localhost:3000/api/studies', {
