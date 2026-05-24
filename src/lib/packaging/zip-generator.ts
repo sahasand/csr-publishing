@@ -6,13 +6,15 @@
  */
 
 import archiver from 'archiver';
+import { createHash } from 'crypto';
 import { createWriteStream, createReadStream } from 'fs';
 import { mkdir, writeFile, stat, copyFile, readFile } from 'fs/promises';
 import { join, dirname, normalize, isAbsolute, basename, relative } from 'path';
 import { PDFDocument } from 'pdf-lib';
 import { getFullPath } from '@/lib/storage';
+import { calculateMd5FromBuffer } from './checksum';
 import { generateEctdXml, type XmlGenerationOptions } from './xml-generator';
-import type { LeafEntry, XmlGenerationResult, PackageFile } from './types';
+import type { LeafEntry, XmlGenerationResult, PackageFile, FileDigest } from './types';
 import {
   processPdf,
   type BookmarkEntry,
@@ -250,8 +252,12 @@ export async function generateExportArtifacts(
     await writeFile(coverPath, coverPage.pdfBytes);
   }
 
-  // Generate eCTD XML backbone files
-  const xmlResult = await generateEctdXml(manifest, xmlOptions);
+  // Generate eCTD XML backbone files. Pass the digests of the files actually
+  // written into the structure so leaf checksums/sizes match the shipped bytes.
+  const xmlResult = await generateEctdXml(manifest, {
+    ...xmlOptions,
+    fileDigests: structureResult.fileDigests,
+  });
 
   // Write index.xml to eCTD root
   const indexXmlPath = join(ectdDir, 'index.xml');
@@ -319,6 +325,12 @@ export interface EctdStructureResult {
     bookmarksInjected: number;
     hyperlinksProcessed: number;
   };
+  /**
+   * Digest (checksum + size) of each file as written into the structure,
+   * keyed by the file's target path. Used to keep the eCTD XML backbone in
+   * sync with the processed bytes actually shipped in the package.
+   */
+  fileDigests: Map<string, FileDigest>;
 }
 
 /**
@@ -358,6 +370,7 @@ export async function createEctdStructure(
   }
 
   const pdfResults: PdfProcessingFileResult[] = [];
+  const fileDigests = new Map<string, FileDigest>();
   let processed = 0;
   let failed = 0;
   let totalBookmarks = 0;
@@ -391,8 +404,15 @@ export async function createEctdStructure(
       );
 
       if (processResult) {
-        // Write processed PDF
+        // Write processed PDF (bytes differ from source: bookmarks/hyperlinks)
         await writeFile(targetPath, processResult.bytes);
+
+        // Record the digest of the processed bytes that ship in the package
+        const processedBuffer = Buffer.from(processResult.bytes);
+        fileDigests.set(file.targetPath, {
+          checksum: calculateMd5FromBuffer(processedBuffer),
+          fileSize: processedBuffer.length,
+        });
 
         const bookmarksInjected = processResult.result.bookmarkResult?.bookmarkCount ?? 0;
         const hyperlinksProcessed = processResult.result.hyperlinkResult?.totalLinks ?? 0;
@@ -410,7 +430,8 @@ export async function createEctdStructure(
         });
       } else {
         // Processing failed - copy original file with warning
-        await copyFileWithStream(sourcePath, targetPath);
+        const digest = await copyFileWithStream(sourcePath, targetPath);
+        fileDigests.set(file.targetPath, digest);
         failed++;
 
         pdfResults.push({
@@ -422,7 +443,8 @@ export async function createEctdStructure(
       }
     } else {
       // Non-PDF files or processing disabled - copy as-is
-      await copyFileWithStream(sourcePath, targetPath);
+      const digest = await copyFileWithStream(sourcePath, targetPath);
+      fileDigests.set(file.targetPath, digest);
     }
   }
 
@@ -434,6 +456,7 @@ export async function createEctdStructure(
       bookmarksInjected: totalBookmarks,
       hyperlinksProcessed: totalHyperlinks,
     },
+    fileDigests,
   };
 }
 
@@ -456,19 +479,33 @@ async function createFolderStructure(
 }
 
 /**
- * Copy a file using streams for efficient large file handling
+ * Copy a file using streams for efficient large file handling.
+ *
+ * Computes the MD5 checksum and byte size of the copied content as it streams,
+ * so callers can record the digest of the bytes actually written without a
+ * second pass over the file.
+ *
+ * @returns The MD5 checksum (lowercase hex) and size in bytes of the copied file
  */
 async function copyFileWithStream(
   sourcePath: string,
   targetPath: string
-): Promise<void> {
+): Promise<FileDigest> {
   return new Promise((resolve, reject) => {
+    const hash = createHash('md5');
+    let fileSize = 0;
     const readStream = createReadStream(sourcePath);
     const writeStream = createWriteStream(targetPath);
 
+    readStream.on('data', (chunk) => {
+      hash.update(chunk);
+      fileSize += chunk.length;
+    });
     readStream.on('error', reject);
     writeStream.on('error', reject);
-    writeStream.on('finish', resolve);
+    writeStream.once('finish', () =>
+      resolve({ checksum: hash.digest('hex').toLowerCase(), fileSize })
+    );
 
     readStream.pipe(writeStream);
   });

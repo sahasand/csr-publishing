@@ -63,17 +63,46 @@ export async function GET(
   }
 }
 
+// Fields a client is allowed to update. Storage paths (sourcePath,
+// processedPath) are deliberately excluded — they are set only by server-side
+// processing and accepting them from clients would enable path traversal in
+// the file-download route.
+const VALID_UPDATE_FIELDS = [
+  'status',
+  'processingError',
+  'pageCount',
+  'pdfVersion',
+  'isPdfA',
+] as const;
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const body: UpdateDocumentInput = await request.json();
+    const body: UpdateDocumentInput & Record<string, unknown> = await request.json();
+
+    // Whitelist updatable fields
+    const data: Record<string, unknown> = {};
+    for (const field of VALID_UPDATE_FIELDS) {
+      if (body[field] !== undefined) {
+        data[field] = body[field];
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json(
+        {
+          error: `Request body must contain at least one valid field: ${VALID_UPDATE_FIELDS.join(', ')}`,
+        },
+        { status: 400 }
+      );
+    }
 
     const document = await db.document.update({
       where: { id },
-      data: body,
+      data,
       include: { slot: true },
     });
 

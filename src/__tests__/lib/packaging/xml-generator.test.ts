@@ -32,6 +32,7 @@ import type {
   EctdXmlConfig,
   LeafEntry,
 } from '@/lib/packaging/types';
+import { calculateMd5 } from '@/lib/packaging/checksum';
 
 // Mock checksum calculation
 vi.mock('@/lib/packaging/checksum', () => ({
@@ -407,5 +408,66 @@ describe('generateEctdXml Integration', () => {
 
     const codes = result.leafEntries.map((l) => l.nodeCode);
     expect(codes).toEqual(['16.1', '16.1.1', '16.2']);
+  });
+});
+
+describe('generateEctdXml with fileDigests (checksum integrity)', () => {
+  const createMockManifest = (): PackageManifest => ({
+    studyId: 'study-uuid-123',
+    studyNumber: 'STUDY-001',
+    generatedAt: new Date(),
+    files: [
+      {
+        sourceDocumentId: 'doc-1',
+        sourcePath: 'studies/study-001/protocol.pdf',
+        targetPath: 'm5/study-001/16-1/protocol.pdf',
+        nodeCode: '16.1',
+        nodeTitle: 'Protocol',
+        fileName: 'protocol.pdf',
+        version: 1,
+        fileSize: 1024, // stale source size (pre-processing)
+      },
+    ],
+    readiness: {
+      ready: true,
+      missingRequired: [],
+      pendingApproval: [],
+      validationErrors: 0,
+      unresolvedAnnotations: 0,
+      totalFiles: 1,
+      totalRequiredNodes: 1,
+    },
+    folderStructure: [],
+  });
+
+  it('uses provided file digests for leaf checksum and size instead of hashing the source', async () => {
+    vi.mocked(calculateMd5).mockClear();
+    const manifest = createMockManifest();
+    const fileDigests = new Map([
+      [
+        'm5/study-001/16-1/protocol.pdf',
+        { checksum: 'aabbccddeeff00112233445566778899', fileSize: 5555 },
+      ],
+    ]);
+
+    const result = await generateEctdXml(manifest, { fileDigests });
+
+    const leaf = result.leafEntries[0];
+    expect(leaf.checksum).toBe('aabbccddeeff00112233445566778899');
+    expect(leaf.fileSize).toBe(5555);
+    // Must NOT re-hash the source file when a digest of the shipped bytes is provided
+    expect(vi.mocked(calculateMd5)).not.toHaveBeenCalled();
+  });
+
+  it('falls back to hashing the source when no digest is available for a file', async () => {
+    vi.mocked(calculateMd5).mockClear();
+    const manifest = createMockManifest();
+
+    const result = await generateEctdXml(manifest, {});
+
+    const leaf = result.leafEntries[0];
+    expect(vi.mocked(calculateMd5)).toHaveBeenCalledWith('studies/study-001/protocol.pdf');
+    expect(leaf.checksum).toBe('d41d8cd98f00b204e9800998ecf8427e');
+    expect(leaf.fileSize).toBe(1024);
   });
 });

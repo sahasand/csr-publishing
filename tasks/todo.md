@@ -1,5 +1,36 @@
 # eCTD XML Backbone and Full Publishing System
 
+## Critical Review Fixes (2026-05-24) ✅ COMPLETE
+
+Fixed 3 critical issues from the codebase review (TDD: test → fail → fix).
+
+### #1 eCTD leaf checksums computed on source bytes, not shipped (processed) bytes
+- [x] RED: `generateEctdXml` honors a `fileDigests` map (leaf checksum + size come from it, not `calculateMd5(sourcePath)`)
+- [x] RED: `createEctdStructure` returns `fileDigests` keyed by targetPath; `generateExportArtifacts` passes them into `generateEctdXml`
+- [x] GREEN: hash the actual written bytes (processed PDF buffer / streamed copy) and feed them to the XML
+- Files: `xml-generator.ts`, `zip-generator.ts`, `types.ts`
+
+### #2 Converted PDFs never reach the package (raw .docx shipped)
+- [x] RED: `assemblePackage` uses `processedPath` + `.pdf` filename when a document has been converted
+- [x] GREEN: prefer `processedPath` over `sourcePath`; add `replaceExtension` helper
+- Files: `assembler.ts`, `folder-structure.ts`
+
+### #4 Mass-assignment PATCH → path-traversal file read
+- [x] RED: studies PATCH strips non-whitelisted fields; documents PATCH strips `processedPath`
+- [x] RED: download route rejects a stored path that escapes UPLOAD_DIR
+- [x] GREEN: whitelist update fields (match `nodes/[id]` pattern); add path-containment guard on download
+- Files: `studies/[id]/route.ts`, `documents/[id]/route.ts`, `documents/[id]/file/route.ts`
+
+### Review / Results
+- Added 10 tests across 6 files (3 new: study-detail, document-detail, document-file).
+- `npm run test:run`: **369 passed, 1 skipped, 1 failed**. The 1 failure is PRE-EXISTING and unrelated
+  (`studies.test.ts > POST creates a new study` — its mock lacks `structureTemplate.findFirst`; review finding #11, in the POST handler I never touched).
+- `npx tsc --noEmit`: no new errors in production `src/` (pre-existing test-file errors remain).
+- `eslint` on changed files: 0 errors (4 pre-existing unused-import warnings, none introduced here).
+- Out of scope (still open from review): cover-page leaf omission (M1), byte-scan validation heuristics, auth layer, synchronous processing, the stale POST test mock (#11).
+
+
+
 ## Maintenance: Agent Docs (2026-02-04)
 - [x] Review repository layout for AGENTS.md accuracy
 - [x] Update AGENTS.md repo map and data flow notes

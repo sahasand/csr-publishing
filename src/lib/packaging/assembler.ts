@@ -18,6 +18,7 @@ import type {
 import {
   codeToFolderPath,
   sanitizeFileName,
+  replaceExtension,
   buildFolderTree,
 } from './folder-structure';
 import { DEFAULT_ASSEMBLY_OPTIONS } from './types';
@@ -292,13 +293,22 @@ export async function assemblePackage(
     const node = nodes.find((n) => n.id === slotId);
     if (!node) continue;
 
+    // When a document was converted (e.g. Word -> PDF), the converted PDF lives
+    // at processedPath. Package that file, not the original source, and reflect
+    // the .pdf extension in the eCTD file name / leaf.
+    const usesConvertedPdf = Boolean(doc.processedPath);
+    const effectiveSourcePath = doc.processedPath ?? doc.sourcePath;
+    const effectiveFileName = usesConvertedPdf
+      ? replaceExtension(doc.sourceFileName, 'pdf')
+      : doc.sourceFileName;
+
     const folderPath = codeToFolderPath(node.code, studyNumber);
-    const sanitizedName = sanitizeFileName(doc.sourceFileName);
+    const sanitizedName = sanitizeFileName(effectiveFileName);
     const targetPath = `${folderPath}/${sanitizedName}`;
 
     files.push({
       sourceDocumentId: doc.id,
-      sourcePath: doc.sourcePath,
+      sourcePath: effectiveSourcePath,
       targetPath,
       nodeCode: node.code,
       nodeTitle: node.title,

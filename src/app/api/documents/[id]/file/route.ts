@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createReadStream, statSync } from 'fs';
-import { join } from 'path';
+import { resolve, sep } from 'path';
 import { db } from '@/lib/db';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
@@ -33,7 +33,14 @@ export async function GET(
 
     // Prefer processed path if available, otherwise use source
     const relativePath = document.processedPath || document.sourcePath;
-    const fullPath = join(UPLOAD_DIR, relativePath);
+
+    // Defense-in-depth: ensure the resolved path stays within UPLOAD_DIR.
+    // Stored paths should always be UUID-based, but never trust them blindly.
+    const baseDir = resolve(UPLOAD_DIR);
+    const fullPath = resolve(baseDir, relativePath);
+    if (fullPath !== baseDir && !fullPath.startsWith(baseDir + sep)) {
+      return NextResponse.json({ error: 'File not found' }, { status: 404 });
+    }
 
     // Check if file exists and get stats
     let fileStats;

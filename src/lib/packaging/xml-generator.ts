@@ -17,6 +17,7 @@ import type {
   EctdXmlConfig,
   XmlGenerationResult,
   SubmissionType,
+  FileDigest,
 } from './types';
 
 // Re-export for convenience
@@ -39,6 +40,13 @@ export interface XmlGenerationOptions {
   skipChecksums?: boolean;
   /** Leaf ID prefix */
   leafIdPrefix?: string;
+  /**
+   * Digests (checksum + size) of the files as actually written into the
+   * package, keyed by target path. When present, these are used for the leaf
+   * checksum/size instead of re-hashing the source file, so the XML backbone
+   * matches the processed bytes that ship in the ZIP.
+   */
+  fileDigests?: Map<string, FileDigest>;
 }
 
 /**
@@ -51,6 +59,7 @@ const DEFAULT_OPTIONS: Required<XmlGenerationOptions> = {
   fdaMetadata: {},
   skipChecksums: false,
   leafIdPrefix: 'leaf',
+  fileDigests: new Map(),
 };
 
 /**
@@ -75,10 +84,17 @@ async function fileToLeafEntry(
   options: Required<XmlGenerationOptions>
 ): Promise<{ leaf: LeafEntry; warning?: string }> {
   let checksum = '';
+  let fileSize = file.fileSize;
   let warning: string | undefined;
 
-  // Calculate checksum if not skipping
-  if (!options.skipChecksums) {
+  // Prefer the digest of the bytes actually written to the package (computed
+  // after PDF processing). This keeps the leaf checksum/size in sync with the
+  // shipped file. Fall back to hashing the source only when no digest exists.
+  const digest = options.fileDigests.get(file.targetPath);
+  if (digest) {
+    checksum = digest.checksum;
+    fileSize = digest.fileSize;
+  } else if (!options.skipChecksums) {
     try {
       checksum = await calculateMd5(file.sourcePath);
     } catch (error) {
@@ -96,7 +112,7 @@ async function fileToLeafEntry(
     href,
     checksum,
     checksumType: 'md5',
-    fileSize: file.fileSize,
+    fileSize,
     title: `${file.nodeCode} - ${file.nodeTitle}`,
     nodeCode: file.nodeCode,
   };

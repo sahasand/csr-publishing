@@ -38,17 +38,44 @@ export async function GET(
   }
 }
 
+// Fields a client is allowed to update. Anything else (id, studyId, timestamps,
+// etc.) is ignored to prevent mass-assignment.
+const VALID_UPDATE_FIELDS = [
+  'sponsor',
+  'therapeuticArea',
+  'phase',
+  'status',
+  'activeTemplateId',
+] as const;
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const body: UpdateStudyInput = await request.json();
+    const body: UpdateStudyInput & Record<string, unknown> = await request.json();
+
+    // Whitelist updatable fields
+    const data: Record<string, unknown> = {};
+    for (const field of VALID_UPDATE_FIELDS) {
+      if (body[field] !== undefined) {
+        data[field] = body[field];
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json(
+        {
+          error: `Request body must contain at least one valid field: ${VALID_UPDATE_FIELDS.join(', ')}`,
+        },
+        { status: 400 }
+      );
+    }
 
     const study = await db.study.update({
       where: { id },
-      data: body,
+      data,
       include: {
         activeTemplate: true,
       },

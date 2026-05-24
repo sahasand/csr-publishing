@@ -865,4 +865,36 @@ describe('zip-generator', () => {
       );
     });
   });
+
+  describe('file digests (checksum integrity)', () => {
+    it('createEctdStructure returns a digest for each written file keyed by target path', async () => {
+      const manifest = createMockManifest();
+
+      const result = await createEctdStructure(manifest, '/output/ectd');
+
+      expect(result.fileDigests).toBeInstanceOf(Map);
+      expect(result.fileDigests.size).toBe(2);
+      expect(result.fileDigests.has('m5/datasets/file1.pdf')).toBe(true);
+      expect(result.fileDigests.has('m5/datasets/file2.pdf')).toBe(true);
+
+      const digest = result.fileDigests.get('m5/datasets/file1.pdf');
+      expect(typeof digest!.checksum).toBe('string');
+      expect(digest!.checksum.length).toBeGreaterThan(0);
+      expect(typeof digest!.fileSize).toBe('number');
+    });
+
+    it('generateExportArtifacts passes the structure file digests into XML generation', async () => {
+      const manifest = createMockManifest();
+      const bookmarks = createMockBookmarks();
+      const hyperlinks = createMockHyperlinks();
+
+      await generateExportArtifacts(manifest, bookmarks, hyperlinks, '/output');
+
+      const xmlCall = mocks.generateEctdXml.mock.calls[0];
+      const optionsArg = xmlCall[1];
+      expect(optionsArg?.fileDigests).toBeInstanceOf(Map);
+      expect(optionsArg.fileDigests.size).toBe(manifest.files.length);
+      expect(optionsArg.fileDigests.has('m5/datasets/file1.pdf')).toBe(true);
+    });
+  });
 });
