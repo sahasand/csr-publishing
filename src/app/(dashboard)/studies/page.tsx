@@ -91,7 +91,7 @@ export default function StudiesPage() {
                   placeholder="e.g., A Phase 3 Randomized Study of Drug X in ..."
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Study ID (Protocol Number) *
