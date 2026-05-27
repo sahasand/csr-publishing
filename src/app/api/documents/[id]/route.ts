@@ -64,25 +64,53 @@ export async function GET(
   }
 }
 
+// Fields a client is allowed to update via PATCH. Two categories are
+// deliberately excluded:
+//   - status: workflow transitions must go through
+//     POST /api/documents/[id]/transition so rules and audit history are enforced.
+//   - sourcePath / processedPath: set only by server-side processing; accepting
+//     them from clients would enable path traversal in the file-download route.
+const VALID_UPDATE_FIELDS = [
+  'processingError',
+  'pageCount',
+  'pdfVersion',
+  'isPdfA',
+] as const;
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const body: UpdateDocumentInput = await request.json();
+    const body: UpdateDocumentInput & Record<string, unknown> = await request.json();
 
-    // Strip status from PATCH body — status changes must go through
-    // POST /api/documents/[id]/transition to enforce workflow rules
-    const { status, ...safeFields } = body;
+    // Status changes must go through POST /api/documents/[id]/transition to
+    // enforce workflow rules — ignore it here.
+    if (body.status !== undefined) {
+      console.warn(`PATCH /api/documents/${id}: ignored status field "${body.status}". Use POST /api/documents/${id}/transition instead.`);
+    }
 
-    if (status) {
-      console.warn(`PATCH /api/documents/${id}: ignored status field "${status}". Use POST /api/documents/${id}/transition instead.`);
+    // Whitelist updatable fields
+    const data: Record<string, unknown> = {};
+    for (const field of VALID_UPDATE_FIELDS) {
+      if (body[field] !== undefined) {
+        data[field] = body[field];
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json(
+        {
+          error: `Request body must contain at least one valid field: ${VALID_UPDATE_FIELDS.join(', ')}`,
+        },
+        { status: 400 }
+      );
     }
 
     const document = await db.document.update({
       where: { id },
-      data: safeFields,
+      data,
       include: { slot: true },
     });
 

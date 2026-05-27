@@ -295,6 +295,52 @@ describe('assembler', () => {
       expect(manifest.files[0].targetPath).toContain('16-1');
     });
 
+    it('packages the converted PDF (processedPath) instead of the source for converted documents', async () => {
+      const mockStudy = createMockStudy({
+        documents: [
+          createMockDocument({
+            slotId: 'node-1',
+            status: 'APPROVED',
+            sourceFileName: 'clinical-report.docx',
+            sourcePath: 'source/original-uuid.docx',
+            processedPath: 'processed/converted-uuid.pdf',
+          }),
+        ],
+      });
+      vi.mocked(db.study.findUnique).mockResolvedValue(mockStudy);
+
+      const manifest = await assemblePackage('study-1');
+
+      expect(manifest.files).toHaveLength(1);
+      const file = manifest.files[0];
+      // Packaging must read the converted PDF, not the original Word doc
+      expect(file.sourcePath).toBe('processed/converted-uuid.pdf');
+      // Packaged file name / eCTD leaf must be a .pdf, not .docx
+      expect(file.fileName.endsWith('.pdf')).toBe(true);
+      expect(file.fileName).not.toContain('docx');
+      expect(file.targetPath.endsWith('.pdf')).toBe(true);
+    });
+
+    it('uses the original source path when no converted PDF exists', async () => {
+      const mockStudy = createMockStudy({
+        documents: [
+          createMockDocument({
+            slotId: 'node-1',
+            status: 'APPROVED',
+            sourceFileName: 'report.pdf',
+            sourcePath: 'source/report-uuid.pdf',
+            processedPath: null,
+          }),
+        ],
+      });
+      vi.mocked(db.study.findUnique).mockResolvedValue(mockStudy);
+
+      const manifest = await assemblePackage('study-1');
+
+      expect(manifest.files[0].sourcePath).toBe('source/report-uuid.pdf');
+      expect(manifest.files[0].fileName.endsWith('.pdf')).toBe(true);
+    });
+
     it('builds folder structure', async () => {
       const mockStudy = createMockStudy({
         documents: [

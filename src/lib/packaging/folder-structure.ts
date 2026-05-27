@@ -108,6 +108,27 @@ export function sanitizeFileName(fileName: string): string {
 }
 
 /**
+ * Replace (or add) a file name's extension.
+ *
+ * Used when a source document has been converted (e.g. a `.docx` converted to
+ * a `.pdf`) so the packaged file name reflects the bytes actually shipped.
+ *
+ * Examples:
+ *   replaceExtension("report.docx", "pdf") -> "report.pdf"
+ *   replaceExtension("my.report.rtf", "pdf") -> "my.report.pdf"
+ *   replaceExtension("report", "pdf") -> "report.pdf"
+ *
+ * @param fileName - The original file name
+ * @param newExt - The new extension (with or without a leading dot)
+ * @returns The file name with the new extension
+ */
+export function replaceExtension(fileName: string, newExt: string): string {
+  const ext = newExt.replace(/^\./, '');
+  const base = fileName.replace(/\.[^./\\]+$/, '');
+  return `${base}.${ext}`;
+}
+
+/**
  * Build a folder tree structure from a list of package files
  *
  * Creates a hierarchical folder structure based on file target paths.

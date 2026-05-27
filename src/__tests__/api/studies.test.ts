@@ -12,6 +12,9 @@ vi.mock('@/lib/db', () => ({
       delete: vi.fn(),
       count: vi.fn(),
     },
+    structureTemplate: {
+      findFirst: vi.fn(),
+    },
   },
 }));
 
@@ -67,6 +70,35 @@ describe('Studies API', () => {
   });
 
   describe('POST /api/studies', () => {
+    it('creates a new study', async () => {
+      const newStudy = {
+        id: '456',
+        studyId: 'TEST-002',
+        sponsor: 'New Pharma',
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(db.study.findUnique).mockResolvedValue(null);
+      vi.mocked(db.structureTemplate.findFirst).mockResolvedValue(null);
+      vi.mocked(db.study.create).mockResolvedValue(newStudy);
+
+      const request = new NextRequest('http://localhost:3000/api/studies', {
+        method: 'POST',
+        body: JSON.stringify({
+          studyId: 'TEST-002',
+          sponsor: 'New Pharma',
+        }),
+      });
+
+      const response = await POST(request);
+      const json = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(json.data.studyId).toBe('TEST-002');
+    });
+
     it('returns 400 for missing required fields', async () => {
       const request = new NextRequest('http://localhost:3000/api/studies', {
         method: 'POST',

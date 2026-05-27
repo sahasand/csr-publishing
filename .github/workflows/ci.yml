@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    # DATABASE_URL is needed for the Prisma client/adapter at build time.
+    env:
+      DATABASE_URL: "file:./ci.db"
+      UPLOAD_DIR: "./uploads"
+      EXPORTS_DIR: "./exports"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run tests
+        run: npm run test:run
+
+      - name: Build
+        run: npm run build

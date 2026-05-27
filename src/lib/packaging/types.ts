@@ -232,6 +232,21 @@ export const DEFAULT_ECTD_CONFIG: EctdXmlConfig = {
 };
 
 /**
+ * Checksum + size of a file as it was actually written into the eCTD package.
+ *
+ * Files are processed (bookmarks injected, hyperlinks rewritten) before being
+ * written into the package, so their bytes differ from the original source.
+ * The XML backbone must reference the digest of the *shipped* bytes, keyed by
+ * target path, so that eCTD validators' checksum verification passes.
+ */
+export interface FileDigest {
+  /** MD5 checksum (lowercase hex) of the written file */
+  checksum: string;
+  /** Size in bytes of the written file */
+  fileSize: number;
+}
+
+/**
  * Result of XML generation
  */
 export interface XmlGenerationResult {
