@@ -46,6 +46,12 @@ const VALID_UPDATE_FIELDS = [
   'phase',
   'status',
   'activeTemplateId',
+  'title',
+  'productName',
+  'indication',
+  'applicationNumber',
+  'applicationType',
+  'sponsorAddress',
 ] as const;
 
 export async function PATCH(

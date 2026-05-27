@@ -131,6 +131,13 @@ export async function exportPackage(
         sponsor: true,
         studyId: true,
         therapeuticArea: true,
+        phase: true,
+        title: true,
+        productName: true,
+        indication: true,
+        applicationNumber: true,
+        applicationType: true,
+        sponsorAddress: true,
       },
     });
 
@@ -194,11 +201,16 @@ export async function exportPackage(
     if (options.includeCoverPage !== false && manifest.files.length > 0) {
       const coverMetadata: CoverPageMetadata = {
         studyNumber: study.studyId,
+        studyTitle: study.title || undefined,
         sponsor: options.sponsor || study.sponsor,
+        sponsorAddress: study.sponsorAddress || undefined,
         therapeuticArea: study.therapeuticArea || undefined,
-        applicationNumber: options.applicationNumber,
-        applicationType: options.applicationType,
-        productName: options.productName,
+        phase: study.phase || undefined,
+        indication: study.indication || undefined,
+        // Study record takes precedence; export options remain as a fallback override.
+        applicationNumber: study.applicationNumber || options.applicationNumber,
+        applicationType: study.applicationType || options.applicationType,
+        productName: study.productName || options.productName,
         submissionType: submissionType.charAt(0).toUpperCase() + submissionType.slice(1),
         sequenceNumber,
         generatedAt: new Date(),

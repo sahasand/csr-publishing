@@ -23,6 +23,12 @@ export interface EditableStudy {
   therapeuticArea?: string | null;
   phase?: string | null;
   status: string;
+  title?: string | null;
+  productName?: string | null;
+  indication?: string | null;
+  applicationNumber?: string | null;
+  applicationType?: string | null;
+  sponsorAddress?: string | null;
 }
 
 export interface EditStudyDialogProps {
@@ -45,6 +51,12 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
   const [therapeuticArea, setTherapeuticArea] = useState('');
   const [phase, setPhase] = useState('');
   const [status, setStatus] = useState<'ACTIVE' | 'ARCHIVED'>('ACTIVE');
+  const [title, setTitle] = useState('');
+  const [productName, setProductName] = useState('');
+  const [indication, setIndication] = useState('');
+  const [applicationNumber, setApplicationNumber] = useState('');
+  const [applicationType, setApplicationType] = useState('');
+  const [sponsorAddress, setSponsorAddress] = useState('');
 
   // Re-seed the form whenever the dialog opens for a (possibly different) study
   useEffect(() => {
@@ -53,6 +65,12 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
       setTherapeuticArea(study.therapeuticArea ?? '');
       setPhase(study.phase ?? '');
       setStatus(study.status === 'ARCHIVED' ? 'ARCHIVED' : 'ACTIVE');
+      setTitle(study.title ?? '');
+      setProductName(study.productName ?? '');
+      setIndication(study.indication ?? '');
+      setApplicationNumber(study.applicationNumber ?? '');
+      setApplicationType(study.applicationType ?? '');
+      setSponsorAddress(study.sponsorAddress ?? '');
     }
   }, [open, study]);
 
@@ -67,6 +85,12 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
           therapeuticArea: therapeuticArea.trim() || undefined,
           phase: phase.trim() || undefined,
           status,
+          title: title.trim() || undefined,
+          productName: productName.trim() || undefined,
+          indication: indication.trim() || undefined,
+          applicationNumber: applicationNumber.trim() || undefined,
+          applicationType: applicationType || undefined,
+          sponsorAddress: sponsorAddress.trim() || undefined,
         },
       });
       toast.success('Study updated');
@@ -98,6 +122,17 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
             </p>
           </div>
 
+          <div>
+            <label className="text-sm font-medium text-foreground/80">
+              Study Title
+            </label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g., A Phase 3 Randomized Study of Drug X in ..."
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-foreground/80">
@@ -124,6 +159,26 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
             </div>
             <div>
               <label className="text-sm font-medium text-foreground/80">
+                Product / Drug Name
+              </label>
+              <Input
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                placeholder="e.g., Compound AX-101"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground/80">
+                Indication
+              </label>
+              <Input
+                value={indication}
+                onChange={(e) => setIndication(e.target.value)}
+                placeholder="e.g., Metastatic breast cancer"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground/80">
                 Therapeutic Area
               </label>
               <Input
@@ -142,6 +197,43 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
                 placeholder="e.g., Phase 3"
               />
             </div>
+            <div>
+              <label className="text-sm font-medium text-foreground/80">
+                Application Type
+              </label>
+              <Select
+                value={applicationType}
+                onChange={(e) => setApplicationType(e.target.value)}
+              >
+                <option value="">—</option>
+                <option value="IND">IND</option>
+                <option value="NDA">NDA</option>
+                <option value="BLA">BLA</option>
+                <option value="ANDA">ANDA</option>
+                <option value="Other">Other</option>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground/80">
+                Application Number
+              </label>
+              <Input
+                value={applicationNumber}
+                onChange={(e) => setApplicationNumber(e.target.value)}
+                placeholder="e.g., 123456"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-foreground/80">
+              Sponsor Address
+            </label>
+            <Input
+              value={sponsorAddress}
+              onChange={(e) => setSponsorAddress(e.target.value)}
+              placeholder="e.g., 123 Pharma Way, Boston, MA 02110"
+            />
           </div>
 
           <DialogFooter>

@@ -305,10 +305,16 @@ export interface CoverPageConfig {
 export interface CoverPageMetadata {
   /** Protocol/study number */
   studyNumber: string;
+  /** Full study/report title */
+  studyTitle?: string;
   /** Sponsor company name */
   sponsor: string;
+  /** Sponsor mailing address */
+  sponsorAddress?: string;
   /** Therapeutic area */
   therapeuticArea?: string;
+  /** Indication (disease/condition studied) */
+  indication?: string;
   /** Study phase */
   phase?: string;
   /** Application number (NDA, IND, etc.) */

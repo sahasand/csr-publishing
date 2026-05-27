@@ -236,6 +236,34 @@ class TextDrawer {
     this.y -= fontSize * this.config.lineHeight;
   }
 
+  /** Draw centered text, wrapping to the page width across multiple lines. */
+  drawWrappedCentered(text: string, fontSize: number, useBold = false): void {
+    const f = useBold ? this.boldFont : this.font;
+    const maxWidth =
+      this.config.pageWidth - this.config.margins.left - this.config.margins.right;
+
+    const words = text.split(/\s+/).filter(Boolean);
+    const lines: string[] = [];
+    let line = '';
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (line && f.widthOfTextAtSize(candidate, fontSize) > maxWidth) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = candidate;
+      }
+    }
+    if (line) lines.push(line);
+
+    for (const ln of lines) {
+      const textWidth = f.widthOfTextAtSize(ln, fontSize);
+      const x = (this.config.pageWidth - textWidth) / 2;
+      this.page.drawText(ln, { x, y: this.y, size: fontSize, font: f, color: TEXT_COLOR });
+      this.y -= fontSize * this.config.lineHeight;
+    }
+  }
+
   drawLine(label: string, value: string): void {
     const fontSize = this.config.fontSize.body;
 
@@ -375,22 +403,38 @@ export async function generateCoverPage(
   // === Header Section ===
   drawer.drawTitle('CLINICAL STUDY REPORT');
   drawer.drawSubtitle('Electronic Common Technical Document Package');
+
+  // Full study/report title, prominently under the header
+  if (metadata.studyTitle) {
+    drawer.space(12);
+    drawer.drawWrappedCentered(metadata.studyTitle, fullConfig.fontSize.heading, true);
+  }
+
   drawer.space(20);
   drawer.drawSeparator();
   drawer.space(10);
 
   // Metadata lines
   drawer.drawLine('Sponsor', metadata.sponsor);
+  if (metadata.sponsorAddress) {
+    drawer.drawLine('Sponsor Address', metadata.sponsorAddress);
+  }
   drawer.drawLine('Protocol', metadata.studyNumber);
 
   if (metadata.productName) {
     drawer.drawLine('Product', metadata.productName);
+  }
+  if (metadata.indication) {
+    drawer.drawLine('Indication', metadata.indication);
   }
   if (metadata.applicationNumber) {
     const appText = metadata.applicationType
       ? `${metadata.applicationType} ${metadata.applicationNumber}`
       : metadata.applicationNumber;
     drawer.drawLine('Application', appText);
+  }
+  if (metadata.phase) {
+    drawer.drawLine('Phase', metadata.phase);
   }
   if (metadata.therapeuticArea) {
     drawer.drawLine('Therapeutic Area', metadata.therapeuticArea);

@@ -99,6 +99,38 @@ describe('Studies API', () => {
       expect(json.data.studyId).toBe('TEST-002');
     });
 
+    it('persists regulatory cover-page fields on create', async () => {
+      vi.mocked(db.study.findUnique).mockResolvedValue(null);
+      vi.mocked(db.structureTemplate.findFirst).mockResolvedValue(null);
+      vi.mocked(db.study.create).mockResolvedValue({ id: '789', studyId: 'TEST-004' } as any);
+
+      const request = new NextRequest('http://localhost:3000/api/studies', {
+        method: 'POST',
+        body: JSON.stringify({
+          studyId: 'TEST-004',
+          sponsor: 'New Pharma',
+          title: 'A Phase 3 Study of Drug X',
+          productName: 'Compound X',
+          indication: 'Hypertension',
+          applicationNumber: '123456',
+          applicationType: 'NDA',
+          sponsorAddress: '1 Pharma Way',
+        }),
+      });
+
+      await POST(request);
+
+      const createArg = vi.mocked(db.study.create).mock.calls[0][0];
+      expect(createArg.data).toMatchObject({
+        title: 'A Phase 3 Study of Drug X',
+        productName: 'Compound X',
+        indication: 'Hypertension',
+        applicationNumber: '123456',
+        applicationType: 'NDA',
+        sponsorAddress: '1 Pharma Way',
+      });
+    });
+
     it('returns 400 for missing required fields', async () => {
       const request = new NextRequest('http://localhost:3000/api/studies', {
         method: 'POST',

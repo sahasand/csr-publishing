@@ -75,6 +75,12 @@ export async function POST(request: NextRequest) {
         sponsor: body.sponsor,
         therapeuticArea: body.therapeuticArea,
         phase: body.phase,
+        title: body.title,
+        productName: body.productName,
+        indication: body.indication,
+        applicationNumber: body.applicationNumber,
+        applicationType: body.applicationType,
+        sponsorAddress: body.sponsorAddress,
         activeTemplateId: defaultTemplate?.id ?? null,
       },
       include: {

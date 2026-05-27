@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StudyList } from '@/components/studies/study-list';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCreateStudy } from '@/hooks/use-studies';
 import { Plus, X } from 'lucide-react';
@@ -14,8 +15,27 @@ export default function StudiesPage() {
   const [sponsor, setSponsor] = useState('');
   const [therapeuticArea, setTherapeuticArea] = useState('');
   const [phase, setPhase] = useState('');
+  const [title, setTitle] = useState('');
+  const [productName, setProductName] = useState('');
+  const [indication, setIndication] = useState('');
+  const [applicationNumber, setApplicationNumber] = useState('');
+  const [applicationType, setApplicationType] = useState('');
+  const [sponsorAddress, setSponsorAddress] = useState('');
 
   const createStudy = useCreateStudy();
+
+  const resetForm = () => {
+    setStudyId('');
+    setSponsor('');
+    setTherapeuticArea('');
+    setPhase('');
+    setTitle('');
+    setProductName('');
+    setIndication('');
+    setApplicationNumber('');
+    setApplicationType('');
+    setSponsorAddress('');
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,12 +44,15 @@ export default function StudiesPage() {
       sponsor,
       therapeuticArea: therapeuticArea || undefined,
       phase: phase || undefined,
+      title: title || undefined,
+      productName: productName || undefined,
+      indication: indication || undefined,
+      applicationNumber: applicationNumber || undefined,
+      applicationType: applicationType || undefined,
+      sponsorAddress: sponsorAddress || undefined,
     });
     setShowCreate(false);
-    setStudyId('');
-    setSponsor('');
-    setTherapeuticArea('');
-    setPhase('');
+    resetForm();
   };
 
   return (
@@ -56,6 +79,16 @@ export default function StudiesPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-foreground/80">
+                  Study Title
+                </label>
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g., A Phase 3 Randomized Study of Drug X in ..."
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-foreground/80">
@@ -81,6 +114,26 @@ export default function StudiesPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground/80">
+                    Product / Drug Name
+                  </label>
+                  <Input
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                    placeholder="e.g., Compound AX-101"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground/80">
+                    Indication
+                  </label>
+                  <Input
+                    value={indication}
+                    onChange={(e) => setIndication(e.target.value)}
+                    placeholder="e.g., Metastatic breast cancer"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground/80">
                     Therapeutic Area
                   </label>
                   <Input
@@ -99,6 +152,42 @@ export default function StudiesPage() {
                     placeholder="e.g., Phase 3"
                   />
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground/80">
+                    Application Type
+                  </label>
+                  <Select
+                    value={applicationType}
+                    onChange={(e) => setApplicationType(e.target.value)}
+                  >
+                    <option value="">—</option>
+                    <option value="IND">IND</option>
+                    <option value="NDA">NDA</option>
+                    <option value="BLA">BLA</option>
+                    <option value="ANDA">ANDA</option>
+                    <option value="Other">Other</option>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground/80">
+                    Application Number
+                  </label>
+                  <Input
+                    value={applicationNumber}
+                    onChange={(e) => setApplicationNumber(e.target.value)}
+                    placeholder="e.g., 123456"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground/80">
+                  Sponsor Address
+                </label>
+                <Input
+                  value={sponsorAddress}
+                  onChange={(e) => setSponsorAddress(e.target.value)}
+                  placeholder="e.g., 123 Pharma Way, Boston, MA 02110"
+                />
               </div>
               <div className="flex justify-end gap-2">
                 <Button

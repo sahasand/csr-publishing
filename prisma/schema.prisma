@@ -17,6 +17,15 @@ model Study {
   phase            String?
   status           StudyStatus @default(ACTIVE)
   activeTemplateId String?
+
+  // Regulatory / CSR cover-page metadata
+  title             String? // Full study/report title
+  productName       String? // Investigational product / drug name
+  indication        String? // Disease/condition studied
+  applicationNumber String? // IND / NDA / BLA number
+  applicationType   String? // IND, NDA, BLA, etc.
+  sponsorAddress    String? // Sponsor mailing address
+
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

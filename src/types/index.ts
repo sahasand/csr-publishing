@@ -33,6 +33,12 @@ export interface CreateStudyInput {
   sponsor: string;
   therapeuticArea?: string;
   phase?: string;
+  title?: string;
+  productName?: string;
+  indication?: string;
+  applicationNumber?: string;
+  applicationType?: string;
+  sponsorAddress?: string;
 }
 
 export interface UpdateStudyInput {
@@ -41,6 +47,12 @@ export interface UpdateStudyInput {
   phase?: string;
   status?: 'ACTIVE' | 'ARCHIVED';
   activeTemplateId?: string;
+  title?: string;
+  productName?: string;
+  indication?: string;
+  applicationNumber?: string;
+  applicationType?: string;
+  sponsorAddress?: string;
 }
 
 export interface ApiResponse<T> {
