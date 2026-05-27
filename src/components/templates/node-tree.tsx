@@ -33,6 +33,8 @@ import {
   BarChart3,
   File,
   GripVertical,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import type { StructureNode } from '@/types';
 
@@ -53,6 +55,8 @@ export interface NodeTreeProps {
   selectedNodeId?: string;
   onSelectNode?: (nodeId: string) => void;
   onReorder?: (updates: Array<{ id: string; sortOrder: number; parentId?: string | null }>) => void;
+  onEditNode?: (node: StructureNode) => void;
+  onDeleteNode?: (node: StructureNode) => void;
 }
 
 // Icon mapping for document types
@@ -169,7 +173,7 @@ function getDescendantIds(nodeId: string, nodes: StructureNode[]): string[] {
   return descendants;
 }
 
-export function NodeTree({ nodes, selectedNodeId, onSelectNode, onReorder }: NodeTreeProps) {
+export function NodeTree({ nodes, selectedNodeId, onSelectNode, onReorder, onEditNode, onDeleteNode }: NodeTreeProps) {
   // Build tree structure from flat array
   const tree = useMemo(() => buildTree(nodes), [nodes]);
 
@@ -356,6 +360,8 @@ export function NodeTree({ nodes, selectedNodeId, onSelectNode, onReorder }: Nod
               selectedNodeId={selectedNodeId}
               onToggleExpanded={toggleExpanded}
               onSelect={handleSelect}
+              onEditNode={onEditNode}
+              onDeleteNode={onDeleteNode}
               isOver={overId === node.id}
               isDragging={activeId === node.id}
             />
@@ -378,6 +384,8 @@ interface SortableTreeNodeItemProps {
   selectedNodeId?: string;
   onToggleExpanded: (nodeId: string) => void;
   onSelect: (nodeId: string) => void;
+  onEditNode?: (node: StructureNode) => void;
+  onDeleteNode?: (node: StructureNode) => void;
   isOver: boolean;
   isDragging: boolean;
 }
@@ -387,6 +395,8 @@ function SortableTreeNodeItem({
   selectedNodeId,
   onToggleExpanded,
   onSelect,
+  onEditNode,
+  onDeleteNode,
   isOver,
   isDragging,
 }: SortableTreeNodeItemProps) {
@@ -534,6 +544,40 @@ function SortableTreeNodeItem({
             </Badge>
           )}
         </div>
+
+        {/* Row actions */}
+        {(onEditNode || onDeleteNode) && (
+          <div className="flex items-center gap-0.5 flex-shrink-0">
+            {onEditNode && (
+              <button
+                type="button"
+                className="flex items-center justify-center w-7 h-7 rounded hover:bg-muted/60 text-muted-foreground/70 hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditNode(node);
+                }}
+                tabIndex={-1}
+                aria-label={`Edit ${node.code} ${node.title}`}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            )}
+            {onDeleteNode && (
+              <button
+                type="button"
+                className="flex items-center justify-center w-7 h-7 rounded hover:bg-destructive/10 text-muted-foreground/70 hover:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteNode(node);
+                }}
+                tabIndex={-1}
+                aria-label={`Delete ${node.code} ${node.title}`}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

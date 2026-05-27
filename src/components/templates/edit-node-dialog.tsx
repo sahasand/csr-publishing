@@ -27,6 +27,8 @@ export interface EditNodeDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   onDelete?: () => void;
+  /** Open the dialog directly in the delete-confirmation view. */
+  initialShowDelete?: boolean;
 }
 
 /**
@@ -39,6 +41,7 @@ export function EditNodeDialog({
   onOpenChange,
   onSuccess,
   onDelete,
+  initialShowDelete = false,
 }: EditNodeDialogProps) {
   if (!node || !open) return null;
 
@@ -52,6 +55,7 @@ export function EditNodeDialog({
       onOpenChange={onOpenChange}
       onSuccess={onSuccess}
       onDelete={onDelete}
+      initialShowDelete={initialShowDelete}
     />
   );
 }
@@ -63,6 +67,7 @@ interface EditNodeDialogInnerProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   onDelete?: () => void;
+  initialShowDelete: boolean;
 }
 
 function EditNodeDialogInner({
@@ -72,6 +77,7 @@ function EditNodeDialogInner({
   onOpenChange,
   onSuccess,
   onDelete,
+  initialShowDelete,
 }: EditNodeDialogInnerProps) {
   const updateNode = useUpdateNode();
   const deleteNode = useDeleteNode();
@@ -81,7 +87,7 @@ function EditNodeDialogInner({
   const [title, setTitle] = useState(node.title);
   const [documentType, setDocumentType] = useState<UpdateNodeInput['documentType']>(node.documentType);
   const [required, setRequired] = useState(node.required);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(initialShowDelete);
 
   // Check if node has children
   const hasChildren = useMemo(() => {

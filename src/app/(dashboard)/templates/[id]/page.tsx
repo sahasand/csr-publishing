@@ -16,7 +16,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { NodeTree } from '@/components/templates/node-tree';
+import { EditNodeDialog } from '@/components/templates/edit-node-dialog';
+import { AddNodeForm } from '@/components/templates/add-node-form';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { formatDate } from '@/lib/utils';
+import type { StructureNode } from '@/types';
 import {
   ArrowLeft,
   Loader2,
@@ -24,6 +34,7 @@ import {
   Check,
   X,
   Star,
+  Plus,
 } from 'lucide-react';
 
 export default function TemplateEditorPage() {
@@ -39,6 +50,8 @@ export default function TemplateEditorPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [reorderError, setReorderError] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
+  const [editNode, setEditNode] = useState<{ node: StructureNode; mode: 'edit' | 'delete' } | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   // Handle node reordering
   const handleReorder = useCallback(
@@ -223,7 +236,7 @@ export default function TemplateEditorPage() {
       {/* Nodes list */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
               <CardTitle className="text-lg">Structure Nodes</CardTitle>
               <CardDescription>
@@ -231,17 +244,23 @@ export default function TemplateEditorPage() {
                 Drag nodes to reorder them.
               </CardDescription>
             </div>
-            {reorderNodes.isPending && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Saving...
-              </div>
-            )}
-            {reorderError && (
-              <div className="text-sm text-destructive">
-                {reorderError}
-              </div>
-            )}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {reorderNodes.isPending && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </div>
+              )}
+              {reorderError && (
+                <div className="text-sm text-destructive">
+                  {reorderError}
+                </div>
+              )}
+              <Button size="sm" onClick={() => setAddOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Node
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -250,9 +269,44 @@ export default function TemplateEditorPage() {
             selectedNodeId={selectedNodeId}
             onSelectNode={setSelectedNodeId}
             onReorder={handleReorder}
+            onEditNode={(node) => setEditNode({ node, mode: 'edit' })}
+            onDeleteNode={(node) => setEditNode({ node, mode: 'delete' })}
           />
         </CardContent>
       </Card>
+
+      {/* Edit / delete node dialog */}
+      <EditNodeDialog
+        node={editNode?.node ?? null}
+        nodes={template.nodes}
+        open={!!editNode}
+        initialShowDelete={editNode?.mode === 'delete'}
+        onOpenChange={(open) => {
+          if (!open) setEditNode(null);
+        }}
+      />
+
+      {/* Add node dialog */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Node</DialogTitle>
+            <DialogDescription>
+              Add a new section to this template. Choose a parent to nest it, or
+              leave it at the root level.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6 pt-2">
+            <AddNodeForm
+              templateId={id}
+              nodes={template.nodes}
+              compact
+              onSuccess={() => setAddOpen(false)}
+              onCancel={() => setAddOpen(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
