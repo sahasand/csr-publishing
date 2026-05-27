@@ -112,7 +112,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
 
         <form onSubmit={handleSubmit} className="flex flex-col">
           {/* Scrollable field area so the header and footer stay pinned */}
-          <div className="space-y-4 overflow-y-auto max-h-[55vh] pr-1 -mr-1">
+          <div className="space-y-4 overflow-y-auto max-h-[55vh] px-6">
           {/* Protocol number — read-only */}
           <div>
             <label className="block text-sm font-medium text-foreground/80 mb-1.5">
