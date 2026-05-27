@@ -60,3 +60,6 @@ exports/
 _ul*
 output/
 nul
+
+# Dummy/test PDFs (generated via scripts/generate-dummy-pdfs.ts)
+dummy-pdfs/
