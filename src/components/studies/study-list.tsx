@@ -15,14 +15,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { EditStudyDialog, type EditableStudy } from '@/components/studies/edit-study-dialog';
 import { formatDate } from '@/lib/utils';
-import { Trash2, ExternalLink } from 'lucide-react';
+import { Trash2, ExternalLink, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function StudyList() {
   const [page, setPage] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [studyToDelete, setStudyToDelete] = useState<string | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [studyToEdit, setStudyToEdit] = useState<EditableStudy | null>(null);
   const { data, isLoading, error } = useStudies({ page, pageSize: 20 });
   const studies = data?.data;
   const pagination = data?.pagination;
@@ -97,6 +100,17 @@ export function StudyList() {
                   variant="ghost"
                   size="icon"
                   onClick={() => {
+                    setStudyToEdit(study);
+                    setEditDialogOpen(true);
+                  }}
+                  title="Edit study"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
                     setStudyToDelete(study.id);
                     setDeleteDialogOpen(true);
                   }}
@@ -118,6 +132,11 @@ export function StudyList() {
           pageSize={20}
         />
       )}
+      <EditStudyDialog
+        study={studyToEdit}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
