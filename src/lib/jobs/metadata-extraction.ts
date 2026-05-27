@@ -89,16 +89,12 @@ export async function extractMetadata(
   }
 }
 
-/** Extensions that can be converted to PDF */
-const CONVERTIBLE_EXTENSIONS = ['.doc', '.docx', '.rtf', '.odt'];
-
 /**
  * Handles non-PDF files by returning basic file information
- * and triggering PDF conversion for supported document types
  */
 async function handleNonPdfFile(
   documentId: string,
-  filePath: string,
+  _filePath: string,
   extension: string,
   fileSize: number
 ): Promise<ExtendedMetadataResult> {
@@ -119,36 +115,6 @@ async function handleNonPdfFile(
   console.log(
     `[MetadataExtraction] Non-PDF file processed for document ${documentId}: ${extension}`
   );
-
-  // Trigger PDF conversion for convertible document types
-  if (CONVERTIBLE_EXTENSIONS.includes(extension)) {
-    console.log(
-      `[MetadataExtraction] Triggering PDF conversion for document ${documentId}`
-    );
-
-    // Create a conversion job and process it
-    const conversionJob = await db.processingJob.create({
-      data: {
-        documentId,
-        jobType: 'PDF_CONVERSION',
-        status: 'PENDING',
-      },
-    });
-
-    // Process conversion asynchronously (don't await to avoid blocking metadata response)
-    const { processDocumentWithTracking } = await import('../process-document');
-    processDocumentWithTracking(
-      conversionJob.id,
-      documentId,
-      filePath,
-      'PDF_CONVERSION'
-    ).catch((error) => {
-      console.error(
-        `[MetadataExtraction] PDF conversion failed for document ${documentId}:`,
-        error instanceof Error ? error.message : 'Unknown error'
-      );
-    });
-  }
 
   return {
     fileSize,

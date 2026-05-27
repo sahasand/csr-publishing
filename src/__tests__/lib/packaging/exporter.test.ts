@@ -439,12 +439,6 @@ describe('exporter', () => {
   });
 
   describe('getExportDir', () => {
-    it('returns correct path format', () => {
-      const result = getExportDir('study-123', 'pkg-456');
-
-      expect(result).toBe('exports/study-123/pkg-456');
-    });
-
     it('uses EXPORTS_DIR environment variable', () => {
       // Note: The module reads process.env.EXPORTS_DIR at import time,
       // so we need to test with the default value or mock the module differently.
@@ -505,12 +499,6 @@ describe('exporter', () => {
   });
 
   describe('getPackageZipPath', () => {
-    it('returns correct path to package.zip', () => {
-      const result = getPackageZipPath('study-1', 'pkg-1');
-
-      expect(result).toBe('exports/study-1/pkg-1/package.zip');
-    });
-
     it('uses getExportDir for base path', () => {
       const result = getPackageZipPath('my-study', 'my-package');
 

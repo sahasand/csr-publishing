@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 // Job status type matching the Prisma enum
 export type JobStatus = 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
 
-export type JobType = 'PDF_CONVERSION' | 'PDF_VALIDATION' | 'METADATA_EXTRACTION' | 'PACKAGE_EXPORT';
+export type JobType = 'PDF_VALIDATION' | 'METADATA_EXTRACTION' | 'PACKAGE_EXPORT';
 
 // Latest processing job structure returned from document APIs
 export interface LatestProcessingJob {

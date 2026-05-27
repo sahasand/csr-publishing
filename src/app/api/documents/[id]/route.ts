@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { deleteFile } from '@/lib/storage';
 import type { UpdateDocumentInput } from '@/types';
 
 export async function GET(
@@ -63,12 +64,13 @@ export async function GET(
   }
 }
 
-// Fields a client is allowed to update. Storage paths (sourcePath,
-// processedPath) are deliberately excluded — they are set only by server-side
-// processing and accepting them from clients would enable path traversal in
-// the file-download route.
+// Fields a client is allowed to update via PATCH. Two categories are
+// deliberately excluded:
+//   - status: workflow transitions must go through
+//     POST /api/documents/[id]/transition so rules and audit history are enforced.
+//   - sourcePath / processedPath: set only by server-side processing; accepting
+//     them from clients would enable path traversal in the file-download route.
 const VALID_UPDATE_FIELDS = [
-  'status',
   'processingError',
   'pageCount',
   'pdfVersion',
@@ -82,6 +84,12 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body: UpdateDocumentInput & Record<string, unknown> = await request.json();
+
+    // Status changes must go through POST /api/documents/[id]/transition to
+    // enforce workflow rules — ignore it here.
+    if (body.status !== undefined) {
+      console.warn(`PATCH /api/documents/${id}: ignored status field "${body.status}". Use POST /api/documents/${id}/transition instead.`);
+    }
 
     // Whitelist updatable fields
     const data: Record<string, unknown> = {};
@@ -122,7 +130,31 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+
+    // Fetch document to get file paths before deleting the DB record
+    const document = await db.document.findUnique({
+      where: { id },
+      select: { sourcePath: true, processedPath: true },
+    });
+
+    if (!document) {
+      return NextResponse.json(
+        { error: 'Document not found' },
+        { status: 404 }
+      );
+    }
+
+    // Delete DB record first (cascades to annotations, validation results, etc.)
     await db.document.delete({ where: { id } });
+
+    // Clean up physical files from disk
+    if (document.sourcePath) {
+      await deleteFile(document.sourcePath);
+    }
+    if (document.processedPath) {
+      await deleteFile(document.processedPath);
+    }
+
     return NextResponse.json({ data: { success: true } });
   } catch (error) {
     console.error('Failed to delete document:', error);

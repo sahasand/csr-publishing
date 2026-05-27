@@ -3,14 +3,7 @@ import { saveFile } from '@/lib/storage';
 import { db } from '@/lib/db';
 import { processDocumentWithTracking } from '@/lib/process-document';
 
-const ALLOWED_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'text/plain',
-  'text/csv',
-  'application/rtf',
-];
+const ALLOWED_TYPES = ['application/pdf'];
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
@@ -32,10 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    if (!ALLOWED_TYPES.includes(file.type) && !file.name.endsWith('.xpt')) {
+    // Validate file type - only PDFs allowed
+    if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: `File type not allowed: ${file.type}` },
+        { error: 'Only PDF files are accepted' },
         { status: 400 }
       );
     }
@@ -65,24 +58,26 @@ export async function POST(request: NextRequest) {
     // Save file
     const { path, size } = await saveFile(file);
 
-    // Get next version
-    const existingCount = await db.document.count({
-      where: { studyId, slotId },
-    });
+    // Atomically determine next version and create document in a transaction
+    // to prevent race conditions from concurrent uploads to the same slot
+    const document = await db.$transaction(async (tx) => {
+      const existingCount = await tx.document.count({
+        where: { studyId, slotId },
+      });
 
-    // Create document record with PROCESSING status
-    const document = await db.document.create({
-      data: {
-        studyId,
-        slotId,
-        version: existingCount + 1,
-        sourceFileName: file.name,
-        sourcePath: path,
-        mimeType: file.type,
-        fileSize: size,
-        status: 'PROCESSING',
-      },
-      include: { slot: true },
+      return tx.document.create({
+        data: {
+          studyId,
+          slotId,
+          version: existingCount + 1,
+          sourceFileName: file.name,
+          sourcePath: path,
+          mimeType: file.type,
+          fileSize: size,
+          status: 'PROCESSING',
+        },
+        include: { slot: true },
+      });
     });
 
     // Create processing job record

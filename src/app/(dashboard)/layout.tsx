@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { FileText, FolderTree, Settings, LayoutDashboard } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import { SidebarNav } from '@/components/layout/sidebar-nav';
 
 export default function DashboardLayout({
   children,
@@ -11,41 +11,15 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="w-64 border-r border-sidebar-foreground/10 bg-sidebar-bg text-sidebar-foreground">
         <div className="flex items-center gap-3 p-6 border-b border-sidebar-foreground/10">
-          <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-accent shadow-glow-accent" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent shadow-glow-accent">
+            <FileText className="h-5 w-5 text-white" />
+          </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight">CSR Publishing</h1>
+            <p className="text-xs text-sidebar-foreground/50">by TraceScribe</p>
           </div>
         </div>
-        <nav className="px-4 space-y-1">
-          <Link
-            href="/"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground transition-colors"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            Dashboard
-          </Link>
-          <Link
-            href="/studies"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground transition-colors"
-          >
-            <FileText className="h-4 w-4" />
-            Studies
-          </Link>
-          <Link
-            href="/templates"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground transition-colors"
-          >
-            <FolderTree className="h-4 w-4" />
-            Templates
-          </Link>
-          <Link
-            href="/settings"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground transition-colors"
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Link>
-        </nav>
+        <SidebarNav />
       </aside>
 
       {/* Main content */}

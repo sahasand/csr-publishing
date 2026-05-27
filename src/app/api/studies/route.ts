@@ -2,18 +2,37 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import type { CreateStudyInput } from '@/types';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const studies = await db.study.findMany({
-      include: {
-        activeTemplate: true,
-        _count: {
-          select: { documents: true },
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '20', 10) || 20));
+    const skip = (page - 1) * pageSize;
+
+    const [studies, total] = await Promise.all([
+      db.study.findMany({
+        include: {
+          activeTemplate: true,
+          _count: {
+            select: { documents: true },
+          },
         },
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: pageSize,
+      }),
+      db.study.count(),
+    ]);
+
+    return NextResponse.json({
+      data: studies,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
       },
-      orderBy: { updatedAt: 'desc' },
     });
-    return NextResponse.json({ data: studies });
   } catch (error) {
     console.error('Failed to fetch studies:', error);
     return NextResponse.json(

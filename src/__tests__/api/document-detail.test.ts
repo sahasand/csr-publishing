@@ -19,8 +19,23 @@ describe('PATCH /api/documents/[id]', () => {
     vi.clearAllMocks();
   });
 
-  it('updates whitelisted review fields', async () => {
-    vi.mocked(db.document.update).mockResolvedValue({ id: 'd1', status: 'APPROVED' } as any);
+  it('updates whitelisted metadata fields', async () => {
+    vi.mocked(db.document.update).mockResolvedValue({ id: 'd1', pageCount: 12 } as any);
+
+    const request = new NextRequest('http://localhost:3000/api/documents/d1', {
+      method: 'PATCH',
+      body: JSON.stringify({ pageCount: 12, pdfVersion: '1.7' }),
+    });
+
+    const response = await PATCH(request, { params: Promise.resolve({ id: 'd1' }) });
+
+    expect(response.status).toBe(200);
+    const updateArg = vi.mocked(db.document.update).mock.calls[0][0];
+    expect(updateArg.data).toEqual({ pageCount: 12, pdfVersion: '1.7' });
+  });
+
+  it('ignores status (must go through transition endpoint)', async () => {
+    vi.mocked(db.document.update).mockResolvedValue({ id: 'd1' } as any);
 
     const request = new NextRequest('http://localhost:3000/api/documents/d1', {
       method: 'PATCH',
@@ -31,7 +46,8 @@ describe('PATCH /api/documents/[id]', () => {
 
     expect(response.status).toBe(200);
     const updateArg = vi.mocked(db.document.update).mock.calls[0][0];
-    expect(updateArg.data).toEqual({ status: 'APPROVED', pageCount: 12 });
+    expect(updateArg.data).toEqual({ pageCount: 12 });
+    expect(updateArg.data).not.toHaveProperty('status');
   });
 
   it('strips processedPath/sourcePath (path-traversal guard)', async () => {
@@ -40,7 +56,7 @@ describe('PATCH /api/documents/[id]', () => {
     const request = new NextRequest('http://localhost:3000/api/documents/d1', {
       method: 'PATCH',
       body: JSON.stringify({
-        status: 'APPROVED',
+        pageCount: 12,
         processedPath: '../../../etc/passwd',
         sourcePath: '../../secrets',
         studyId: 'other-study',
@@ -51,7 +67,7 @@ describe('PATCH /api/documents/[id]', () => {
 
     expect(response.status).toBe(200);
     const updateArg = vi.mocked(db.document.update).mock.calls[0][0];
-    expect(updateArg.data).toEqual({ status: 'APPROVED' });
+    expect(updateArg.data).toEqual({ pageCount: 12 });
     expect(updateArg.data).not.toHaveProperty('processedPath');
     expect(updateArg.data).not.toHaveProperty('sourcePath');
     expect(updateArg.data).not.toHaveProperty('studyId');

@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Download, Loader2, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ValidationResults } from './validation-results';
 
@@ -56,6 +57,8 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
       // Store result for showing in modal
       setLastExportResult(result);
 
+      toast.success('Package exported successfully');
+
       // Trigger download
       triggerDownload(result.downloadUrl);
 
@@ -67,7 +70,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
       // Notify parent
       onExportComplete?.(result);
     } catch {
-      // Error is handled by mutation state
+      toast.error('Export failed');
     }
   };
 
@@ -145,7 +148,7 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-4">
+          <div className="py-4 px-1">
             {/* List issues */}
             {readinessData && (
               <ul className="text-sm text-muted-foreground space-y-2">
@@ -184,11 +187,23 @@ export function ExportButton({ studyId, onExportComplete, showResultsDialog = tr
                     </span>
                   </li>
                 )}
+                {readinessData.readiness.pendingApproval.length > 0 && (
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">*</span>
+                    <span>
+                      {readinessData.readiness.pendingApproval.length}{' '}
+                      {readinessData.readiness.pendingApproval.length === 1
+                        ? 'document is'
+                        : 'documents are'}{' '}
+                      not yet approved
+                    </span>
+                  </li>
+                )}
               </ul>
             )}
 
             {/* Force export checkbox */}
-            <div className="mt-6 pt-4 border-t border-border">
+            <div className="mt-6 pt-4 border-t border-border px-1">
               <label className="flex items-start gap-3 cursor-pointer">
                 <Checkbox
                   checked={forceExport}

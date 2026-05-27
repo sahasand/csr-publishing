@@ -3,17 +3,36 @@ import { db } from '@/lib/db';
 import { STANDARD_CSR_SECTIONS } from '@/lib/standard-sections';
 import type { CreateTemplateInput } from '@/types';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const templates = await db.structureTemplate.findMany({
-      include: {
-        _count: {
-          select: { nodes: true, studies: true },
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '20', 10) || 20));
+    const skip = (page - 1) * pageSize;
+
+    const [templates, total] = await Promise.all([
+      db.structureTemplate.findMany({
+        include: {
+          _count: {
+            select: { nodes: true, studies: true },
+          },
         },
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: pageSize,
+      }),
+      db.structureTemplate.count(),
+    ]);
+
+    return NextResponse.json({
+      data: templates,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
       },
-      orderBy: { updatedAt: 'desc' },
     });
-    return NextResponse.json({ data: templates });
   } catch (error) {
     console.error('Failed to fetch templates:', error);
     return NextResponse.json(

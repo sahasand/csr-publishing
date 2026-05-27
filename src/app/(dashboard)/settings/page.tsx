@@ -128,7 +128,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-muted-foreground">Allowed Types</p>
-                <p className="text-sm">PDF, DOCX, DOC, TXT, CSV, RTF, XPT</p>
+                <p className="text-sm">PDF</p>
               </div>
             </div>
           </CardContent>

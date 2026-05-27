@@ -26,14 +26,18 @@ import {
   Loader2,
   AlertCircle,
   FileX,
+  Trash2,
 } from 'lucide-react';
-import type { Document, AnnotationWithReplies } from '@/types';
+import { StatusBadge, WorkflowActions } from '@/components/workflow';
+import type { Document, AnnotationWithReplies, DocumentStatusType } from '@/types';
 
 export interface DocumentViewerProps {
   /** ID of the document to display */
   documentId: string;
   /** Additional CSS classes */
   className?: string;
+  /** Callback when delete is requested */
+  onDeleteClick?: (document: Document) => void;
 }
 
 async function fetchDocument(documentId: string): Promise<Document> {
@@ -46,7 +50,7 @@ async function fetchDocument(documentId: string): Promise<Document> {
 /**
  * Full document viewing experience with PDF viewer and annotations panel
  */
-export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
+export function DocumentViewer({ documentId, className, onDeleteClick }: DocumentViewerProps) {
   // State
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
@@ -145,22 +149,29 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border flex-shrink-0">
         <div className="flex items-center gap-4">
-          <h2 className="text-sm font-medium text-foreground truncate max-w-[300px]" title={document.sourceFileName}>
+          <h2 className="text-sm font-medium text-foreground truncate max-w-[200px]" title={document.sourceFileName}>
             {document.sourceFileName}
           </h2>
           <span className="text-xs text-muted-foreground">
             v{document.version}
           </span>
+          <StatusBadge status={document.status as DocumentStatusType} />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          {/* Workflow actions */}
+          <WorkflowActions
+            documentId={documentId}
+            currentStatus={document.status as DocumentStatusType}
+          />
+
           {/* Page info display */}
           <span className="text-xs text-muted-foreground">
             Page {currentPage} of {totalPages || '...'}
           </span>
 
           {/* Zoom info display */}
-          <span className="text-xs text-muted-foreground mx-2">
+          <span className="text-xs text-muted-foreground">
             {zoom}%
           </span>
 
@@ -178,16 +189,26 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
             )}
             Annotations
           </Button>
+
+          {/* Delete button */}
+          {onDeleteClick && document && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDeleteClick(document)}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              title="Delete document"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">
         {/* PDF Viewer - Left side */}
-        <div className={cn(
-          'flex-1 overflow-hidden transition-all duration-200',
-          showAnnotations ? 'mr-0' : 'mr-0'
-        )}>
+        <div className="flex-1 overflow-hidden">
           <PdfViewer
             url={pdfUrl}
             initialPage={currentPage}
@@ -202,18 +223,19 @@ export function DocumentViewer({ documentId, className }: DocumentViewerProps) {
         </div>
 
         {/* Annotation Panel - Right side (collapsible) */}
-        {showAnnotations && (
-          <aside className="w-[320px] flex-shrink-0 border-l border-border bg-muted/40 overflow-hidden">
-            <div className="h-full overflow-y-auto p-4">
-              <AnnotationPanel
-                documentId={documentId}
-                maxPageNumber={totalPages || undefined}
-                onAnnotationClick={handleAnnotationClick}
-                currentUserName="Reviewer"
-              />
-            </div>
-          </aside>
-        )}
+        <aside className={cn(
+          'flex-shrink-0 border-l border-border bg-muted/40 transition-all duration-200 overflow-hidden',
+          showAnnotations ? 'w-[320px]' : 'w-0 border-l-0'
+        )}>
+          <div className="w-[320px] h-full overflow-y-auto p-4">
+            <AnnotationPanel
+              documentId={documentId}
+              maxPageNumber={totalPages || undefined}
+              onAnnotationClick={handleAnnotationClick}
+              currentUserName="Reviewer"
+            />
+          </div>
+        </aside>
       </div>
     </div>
   );
