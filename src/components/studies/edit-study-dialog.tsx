@@ -113,7 +113,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Protocol number — read-only */}
           <div>
-            <label className="text-sm font-medium text-foreground/80">
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
               Study ID (Protocol Number)
             </label>
             <Input value={study?.studyId ?? ''} disabled readOnly />
@@ -123,7 +123,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
           </div>
 
           <div>
-            <label className="text-sm font-medium text-foreground/80">
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
               Study Title
             </label>
             <Input
@@ -135,7 +135,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Sponsor *
               </label>
               <Input
@@ -146,7 +146,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Status
               </label>
               <Select
@@ -158,7 +158,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Product / Drug Name
               </label>
               <Input
@@ -168,7 +168,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Indication
               </label>
               <Input
@@ -178,7 +178,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Therapeutic Area
               </label>
               <Input
@@ -188,7 +188,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Phase
               </label>
               <Input
@@ -198,7 +198,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Application Type
               </label>
               <Select
@@ -214,7 +214,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground/80">
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                 Application Number
               </label>
               <Input
@@ -226,7 +226,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
           </div>
 
           <div>
-            <label className="text-sm font-medium text-foreground/80">
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
               Sponsor Address
             </label>
             <Input

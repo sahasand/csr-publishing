@@ -39,9 +39,11 @@ export default function StudiesPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Protocol number and sponsor are required
+    if (!studyId.trim() || !sponsor.trim()) return;
     await createStudy.mutateAsync({
-      studyId,
-      sponsor,
+      studyId: studyId.trim(),
+      sponsor: sponsor.trim(),
       therapeuticArea: therapeuticArea || undefined,
       phase: phase || undefined,
       title: title || undefined,
@@ -80,7 +82,7 @@ export default function StudiesPage() {
           <CardContent>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-foreground/80">
+                <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                   Study Title
                 </label>
                 <Input
@@ -91,7 +93,7 @@ export default function StudiesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Study ID (Protocol Number) *
                   </label>
                   <Input
@@ -102,7 +104,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Sponsor *
                   </label>
                   <Input
@@ -113,7 +115,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Product / Drug Name
                   </label>
                   <Input
@@ -123,7 +125,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Indication
                   </label>
                   <Input
@@ -133,7 +135,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Therapeutic Area
                   </label>
                   <Input
@@ -143,7 +145,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Phase
                   </label>
                   <Input
@@ -153,7 +155,7 @@ export default function StudiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Application Type
                   </label>
                   <Select
@@ -169,7 +171,7 @@ export default function StudiesPage() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground/80">
+                  <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                     Application Number
                   </label>
                   <Input
@@ -180,7 +182,7 @@ export default function StudiesPage() {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground/80">
+                <label className="block text-sm font-medium text-foreground/80 mb-1.5">
                   Sponsor Address
                 </label>
                 <Input
@@ -197,7 +199,10 @@ export default function StudiesPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createStudy.isPending}>
+                <Button
+                  type="submit"
+                  disabled={createStudy.isPending || !studyId.trim() || !sponsor.trim()}
+                >
                   {createStudy.isPending ? 'Creating...' : 'Create Study'}
                 </Button>
               </div>
