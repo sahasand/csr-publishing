@@ -171,6 +171,22 @@ npm run test -- src/__tests__/api/studies.test.ts
 
 Configured via `railway.toml`. Uses SQLite with persistent volume at `/data`.
 
+**Live URL**: https://csr-publishing-production.up.railway.app
+
+> ⚠️ The live site has **no authentication** — do not host real patient/study data on it.
+
+### Auto-Deploy (current setup)
+
+The Railway service is connected to GitHub `sahasand/csr-publishing` with **auto-deploy from the `master` branch enabled**. Pushing to `master` automatically builds and deploys — no manual step needed.
+
+```bash
+git push origin master   # → Railway builds & deploys automatically
+```
+
+Manual `railway up` still works as a fallback. The CLI-vs-GitHub source is managed in Railway Dashboard → service → Settings → Source.
+
+The steps below document the original one-time setup (volume, env vars, seeding).
+
 ### Step 1: Initial Setup
 
 ```bash
@@ -238,8 +254,10 @@ ls -la /data
 
 ### Redeployment
 
+Pushing to `master` auto-deploys (see Auto-Deploy above). To deploy manually or watch logs:
+
 ```bash
-railway up                    # Deploy latest code
+railway up                    # Manual deploy (fallback)
 railway logs --tail           # Watch deployment logs
 ```
 
@@ -252,6 +270,7 @@ railway logs --tail           # Watch deployment logs
 | Data lost after redeploy | Volume not configured | Add volume, re-seed database |
 | Health check fails | App slow to start | Increase `healthcheckTimeout` in railway.toml (default: 300s) |
 | `ENOENT uploads` | Directory doesn't exist | App auto-creates on first upload; check UPLOAD_DIR env var |
+| Build fails: `Prisma only supports Node.js 20.19+, 22.12+, 24.0+` | nixpacks picked Node < Prisma 7's floor (e.g. 22.11.0) | Keep `engines.node: ">=20.9.0"` in package.json (nudges nixpacks to a compatible build); keep `prisma` in `dependencies`. **Do NOT** pin `NIXPACKS_NODE_VERSION=22` — it resolves to 22.11.0 and breaks the build. |
 
 ### Access Production Database
 
