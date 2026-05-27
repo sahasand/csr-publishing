@@ -21,14 +21,15 @@ const AnnotationPanel = dynamic(
   { ssr: false }
 );
 import {
-  PanelRightClose,
-  PanelRightOpen,
   Loader2,
   AlertCircle,
   FileX,
   Trash2,
+  MessageSquare,
+  ShieldCheck,
 } from 'lucide-react';
 import { StatusBadge, WorkflowActions } from '@/components/workflow';
+import { DocumentValidationPanel } from '@/components/studies/document-validation-panel';
 import type { Document, AnnotationWithReplies, DocumentStatusType } from '@/types';
 
 export interface DocumentViewerProps {
@@ -54,7 +55,10 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
   // State
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
-  const [showAnnotations, setShowAnnotations] = useState(true);
+  // Right-hand panel: which tab is open, or null when collapsed
+  const [rightPanel, setRightPanel] = useState<'annotations' | 'validation' | null>(
+    'annotations'
+  );
   const [totalPages, setTotalPages] = useState<number | null>(null);
 
   // Fetch document details
@@ -93,9 +97,9 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
     setCurrentPage(annotation.pageNumber);
   }, []);
 
-  // Toggle annotation panel visibility
-  const toggleAnnotations = useCallback(() => {
-    setShowAnnotations((prev) => !prev);
+  // Toggle a right-hand panel tab; clicking the active tab collapses the panel
+  const togglePanel = useCallback((panel: 'annotations' | 'validation') => {
+    setRightPanel((prev) => (prev === panel ? null : panel));
   }, []);
 
   // Loading state
@@ -175,19 +179,24 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
             {zoom}%
           </span>
 
-          {/* Annotation panel toggle */}
+          {/* Right panel tabs: Annotations / Validation */}
           <Button
-            variant={showAnnotations ? 'default' : 'outline'}
+            variant={rightPanel === 'annotations' ? 'default' : 'outline'}
             size="sm"
-            onClick={toggleAnnotations}
-            title={showAnnotations ? 'Hide annotations' : 'Show annotations'}
+            onClick={() => togglePanel('annotations')}
+            title={rightPanel === 'annotations' ? 'Hide annotations' : 'Show annotations'}
           >
-            {showAnnotations ? (
-              <PanelRightClose className="h-4 w-4 mr-2" />
-            ) : (
-              <PanelRightOpen className="h-4 w-4 mr-2" />
-            )}
+            <MessageSquare className="h-4 w-4 mr-2" />
             Annotations
+          </Button>
+          <Button
+            variant={rightPanel === 'validation' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => togglePanel('validation')}
+            title={rightPanel === 'validation' ? 'Hide validation' : 'Show validation'}
+          >
+            <ShieldCheck className="h-4 w-4 mr-2" />
+            Validation
           </Button>
 
           {/* Delete button */}
@@ -222,18 +231,23 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
           />
         </div>
 
-        {/* Annotation Panel - Right side (collapsible) */}
+        {/* Right-hand panel (collapsible): Annotations or Validation */}
         <aside className={cn(
           'flex-shrink-0 border-l border-border bg-muted/40 transition-all duration-200 overflow-hidden',
-          showAnnotations ? 'w-[320px]' : 'w-0 border-l-0'
+          rightPanel ? 'w-[320px]' : 'w-0 border-l-0'
         )}>
           <div className="w-[320px] h-full overflow-y-auto p-4">
-            <AnnotationPanel
-              documentId={documentId}
-              maxPageNumber={totalPages || undefined}
-              onAnnotationClick={handleAnnotationClick}
-              currentUserName="Reviewer"
-            />
+            {rightPanel === 'annotations' && (
+              <AnnotationPanel
+                documentId={documentId}
+                maxPageNumber={totalPages || undefined}
+                onAnnotationClick={handleAnnotationClick}
+                currentUserName="Reviewer"
+              />
+            )}
+            {rightPanel === 'validation' && (
+              <DocumentValidationPanel documentId={documentId} />
+            )}
           </div>
         </aside>
       </div>
