@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useQuery } from '@tanstack/react-query';
+import { useDocumentValidation } from '@/hooks/use-validation-results';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -72,6 +73,30 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
     enabled: !!documentId,
   });
 
+  // Validation summary — drives the tab badge and auto-open behaviour
+  const { data: validation } = useDocumentValidation(documentId);
+  const validationErrors = validation?.errors ?? 0;
+  const validationWarnings = validation?.warnings ?? 0;
+  const validationIssues = validationErrors + validationWarnings;
+
+  // Track whether the user has manually picked a panel for the current document
+  // so we don't override their choice when validation data arrives.
+  const userChosePanelRef = useRef(false);
+
+  // Reset the panel to the default whenever the viewed document changes.
+  useEffect(() => {
+    userChosePanelRef.current = false;
+    setRightPanel('annotations');
+  }, [documentId]);
+
+  // Auto-open the Validation tab when the freshly-loaded document has issues,
+  // unless the user has already chosen a panel for this document.
+  useEffect(() => {
+    if (!userChosePanelRef.current && validationIssues > 0) {
+      setRightPanel('validation');
+    }
+  }, [validationIssues]);
+
   // Build PDF URL
   const pdfUrl = `/api/documents/${documentId}/file`;
 
@@ -99,6 +124,7 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
 
   // Toggle a right-hand panel tab; clicking the active tab collapses the panel
   const togglePanel = useCallback((panel: 'annotations' | 'validation') => {
+    userChosePanelRef.current = true;
     setRightPanel((prev) => (prev === panel ? null : panel));
   }, []);
 
@@ -197,6 +223,19 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
           >
             <ShieldCheck className="h-4 w-4 mr-2" />
             Validation
+            {validationIssues > 0 && (
+              <span
+                className={cn(
+                  'ml-2 inline-flex items-center justify-center rounded-full px-1.5 min-w-[1.25rem] h-5 text-xs font-semibold',
+                  validationErrors > 0
+                    ? 'bg-destructive/20 text-destructive'
+                    : 'bg-warning/20 text-warning'
+                )}
+                title={`${validationIssues} validation ${validationIssues === 1 ? 'issue' : 'issues'}`}
+              >
+                {validationIssues}
+              </span>
+            )}
           </Button>
 
           {/* Delete button */}
