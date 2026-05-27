@@ -119,3 +119,39 @@ export function useRunValidation() {
     },
   });
 }
+
+export interface ValidateAllResult {
+  total: number;
+  validated: number;
+  failed: number;
+  failures: { documentId: string; error: string }[];
+}
+
+async function validateAllDocuments(studyId: string): Promise<ValidateAllResult> {
+  const res = await fetch(`/api/studies/${studyId}/validate-all`, {
+    method: 'POST',
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error);
+  return json.data;
+}
+
+/**
+ * Mutation to validate every document in a study at once.
+ * Calls POST /api/studies/[id]/validate-all (status-preserving).
+ * Refreshes the study validation panel and document lists on success.
+ */
+export function useValidateAllDocuments(studyId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => validateAllDocuments(studyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['validation-results', 'study'],
+      });
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      // Validation results feed into export readiness too
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
+    },
+  });
+}

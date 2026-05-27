@@ -97,6 +97,29 @@ export async function POST(request: NextRequest) {
       'METADATA_EXTRACTION'
     );
 
+    // Run PDF/eCTD compliance validation automatically so the Study Validation
+    // panel reflects every uploaded document without manual per-document
+    // triggering. This sets the document status to PROCESSED (passes) or
+    // PROCESSING_FAILED (has errors). Wrapped so a validation hiccup never
+    // fails the upload itself.
+    try {
+      const validationJob = await db.processingJob.create({
+        data: {
+          documentId: document.id,
+          jobType: 'PDF_VALIDATION',
+          status: 'PENDING',
+        },
+      });
+      await processDocumentWithTracking(
+        validationJob.id,
+        document.id,
+        path,
+        'PDF_VALIDATION'
+      );
+    } catch (validationError) {
+      console.error('Auto-validation after upload failed:', validationError);
+    }
+
     // Fetch updated document and job
     const [updatedDocument, updatedJob] = await Promise.all([
       db.document.findUnique({

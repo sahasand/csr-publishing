@@ -17,8 +17,14 @@ import {
   Loader2,
   ChevronDown,
   ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
-import { useStudyValidation } from '@/hooks/use-validation-results';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import {
+  useStudyValidation,
+  useValidateAllDocuments,
+} from '@/hooks/use-validation-results';
 import type {
   StudyValidationSummaryStats,
   DocumentValidationSummary,
@@ -44,6 +50,24 @@ export function StudyValidationPanel({
   const [showAllDocuments, setShowAllDocuments] = React.useState(false);
 
   const { data, isLoading, error } = useStudyValidation(studyId);
+  const validateAll = useValidateAllDocuments(studyId);
+
+  const handleValidateAll = async () => {
+    try {
+      const result = await validateAll.mutateAsync();
+      if (result.failed > 0) {
+        toast.warning(
+          `Validated ${result.validated} of ${result.total} documents (${result.failed} could not be validated)`
+        );
+      } else if (result.total === 0) {
+        toast.info('No documents to validate yet');
+      } else {
+        toast.success(`Validated all ${result.validated} documents`);
+      }
+    } catch {
+      toast.error('Failed to validate documents');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -161,6 +185,26 @@ export function StudyValidationPanel({
       {isExpanded && (
         <CardContent id="study-validation-content">
           <div className="space-y-4">
+            {/* Validate All action */}
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleValidateAll}
+              disabled={validateAll.isPending || summary.totalDocuments === 0}
+            >
+              {validateAll.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Validating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {summary.validatedDocuments > 0 ? 'Re-validate All' : 'Validate All'}
+                </>
+              )}
+            </Button>
+
             {/* Summary Stats */}
             <ValidationSummaryStats summary={summary} />
 
