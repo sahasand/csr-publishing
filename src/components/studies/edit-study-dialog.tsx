@@ -102,7 +102,7 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Study</DialogTitle>
           <DialogDescription className="text-left">
@@ -110,11 +110,13 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          {/* Scrollable field area so the header and footer stay pinned */}
+          <div className="space-y-4 overflow-y-auto max-h-[55vh] pr-1 -mr-1">
           {/* Protocol number — read-only */}
           <div>
             <label className="block text-sm font-medium text-foreground/80 mb-1.5">
-              Study ID (Protocol Number)
+              Study ID (Protocol Number) *
             </label>
             <Input value={study?.studyId ?? ''} disabled readOnly />
             <p className="text-xs text-muted-foreground mt-1">
@@ -235,8 +237,9 @@ export function EditStudyDialog({ study, open, onOpenChange }: EditStudyDialogPr
               placeholder="e.g., 123 Pharma Way, Boston, MA 02110"
             />
           </div>
+          </div>
 
-          <DialogFooter>
+          <DialogFooter className="mt-4 pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"
