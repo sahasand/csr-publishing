@@ -141,6 +141,8 @@ export default function StudyWorkspacePage() {
     queryClient.invalidateQueries({ queryKey: ['documents', 'study', id] });
     // Also refresh study data
     queryClient.invalidateQueries({ queryKey: ['studies', id] });
+    // A new document changes section-fill / readiness — refresh the export panel
+    queryClient.invalidateQueries({ queryKey: ['packages'] });
   };
 
   // Check if a node has documents

@@ -25,6 +25,8 @@ export function useBulkTransition(studyId: string) {
       queryClient.invalidateQueries({ queryKey: ['studies', studyId] });
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['pending-review-count'] });
+      // Refresh export readiness so the dashboard reflects the new statuses
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
     },
   });
 }

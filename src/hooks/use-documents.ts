@@ -33,6 +33,8 @@ export function useDeleteDocument() {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       // Also invalidate studies to update document counts
       queryClient.invalidateQueries({ queryKey: ['studies'] });
+      // Removing a document changes which sections are filled — refresh readiness
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
     },
   });
 }

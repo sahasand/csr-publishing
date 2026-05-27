@@ -97,6 +97,8 @@ export function WorkflowActions({
       toast.success(`Status changed to ${variables.toStatus.replace(/_/g, ' ').toLowerCase()}`);
       queryClient.invalidateQueries({ queryKey: ['document', documentId] });
       queryClient.invalidateQueries({ queryKey: ['documents'] });
+      // Refresh export readiness so the dashboard reflects the new status
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
       setCommentDialogOpen(false);
       setComment('');
       setPendingTransition(null);

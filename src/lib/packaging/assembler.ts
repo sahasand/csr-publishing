@@ -24,6 +24,19 @@ import {
 import { DEFAULT_ASSEMBLY_OPTIONS } from './types';
 
 /**
+ * Document statuses that a force export ("export anyway") may include as a
+ * fallback when no APPROVED/PUBLISHED document exists for a slot. These are the
+ * non-terminal workflow states that still have a usable uploaded file.
+ * PROCESSING / PROCESSING_FAILED are intentionally excluded (no reliable file).
+ */
+const FORCE_INCLUDABLE_STATUSES = [
+  'DRAFT',
+  'PROCESSED',
+  'IN_REVIEW',
+  'CORRECTIONS_NEEDED',
+];
+
+/**
  * Check if a study is ready for packaging
  *
  * Performs comprehensive readiness checks:
@@ -268,10 +281,11 @@ export async function assemblePackage(
           selected = doc;
         }
       }
-      if (
-        options.includeDrafts &&
-        (doc.status === 'DRAFT' || doc.status === 'PROCESSED')
-      ) {
+      // Force export ("export anyway") includes every non-terminal document
+      // status — not just DRAFT/PROCESSED but also IN_REVIEW and
+      // CORRECTIONS_NEEDED — so an in-review study can still be packaged.
+      // Approved/published documents above always take precedence.
+      if (options.includeDrafts && FORCE_INCLUDABLE_STATUSES.includes(doc.status)) {
         if (
           !selected ||
           (selected.status !== 'PUBLISHED' && selected.status !== 'APPROVED')

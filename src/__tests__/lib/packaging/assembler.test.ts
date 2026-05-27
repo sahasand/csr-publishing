@@ -454,6 +454,75 @@ describe('assembler', () => {
       expect(manifest.files).toHaveLength(1);
     });
 
+    // Force export must include in-review / corrections-needed documents too,
+    // otherwise a study whose documents are all IN_REVIEW yields an empty
+    // package ("No documents available for export").
+    it('includes IN_REVIEW documents when includeDrafts (force) is enabled', async () => {
+      const mockStudy = createMockStudy({
+        documents: [
+          createMockDocument({ id: 'doc-1', slotId: 'node-1', status: 'IN_REVIEW' }),
+        ],
+      });
+      vi.mocked(db.study.findUnique).mockResolvedValue(mockStudy);
+
+      const manifest = await assemblePackage('study-1', {
+        includeApproved: true,
+        includePublished: true,
+        includeDrafts: true,
+      });
+
+      expect(manifest.files).toHaveLength(1);
+    });
+
+    it('includes CORRECTIONS_NEEDED documents when includeDrafts (force) is enabled', async () => {
+      const mockStudy = createMockStudy({
+        documents: [
+          createMockDocument({ id: 'doc-1', slotId: 'node-1', status: 'CORRECTIONS_NEEDED' }),
+        ],
+      });
+      vi.mocked(db.study.findUnique).mockResolvedValue(mockStudy);
+
+      const manifest = await assemblePackage('study-1', {
+        includeApproved: true,
+        includePublished: true,
+        includeDrafts: true,
+      });
+
+      expect(manifest.files).toHaveLength(1);
+    });
+
+    it('excludes IN_REVIEW documents when includeDrafts is not enabled', async () => {
+      const mockStudy = createMockStudy({
+        documents: [
+          createMockDocument({ id: 'doc-1', slotId: 'node-1', status: 'IN_REVIEW' }),
+        ],
+      });
+      vi.mocked(db.study.findUnique).mockResolvedValue(mockStudy);
+
+      const manifest = await assemblePackage('study-1');
+
+      expect(manifest.files).toHaveLength(0);
+    });
+
+    it('still prefers an APPROVED document over an IN_REVIEW one under force', async () => {
+      const mockStudy = createMockStudy({
+        documents: [
+          createMockDocument({ id: 'doc-1', slotId: 'node-1', status: 'IN_REVIEW', version: 2 }),
+          createMockDocument({ id: 'doc-2', slotId: 'node-1', status: 'APPROVED', version: 1 }),
+        ],
+      });
+      vi.mocked(db.study.findUnique).mockResolvedValue(mockStudy);
+
+      const manifest = await assemblePackage('study-1', {
+        includeApproved: true,
+        includePublished: true,
+        includeDrafts: true,
+      });
+
+      expect(manifest.files).toHaveLength(1);
+      expect(manifest.files[0].version).toBe(1); // the APPROVED doc
+    });
+
     it('sanitizes file names in target path', async () => {
       const mockStudy = createMockStudy({
         documents: [
