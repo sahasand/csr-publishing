@@ -28,8 +28,9 @@ import {
   Trash2,
   MessageSquare,
   ShieldCheck,
+  History,
 } from 'lucide-react';
-import { StatusBadge, WorkflowActions } from '@/components/workflow';
+import { StatusBadge, WorkflowActions, StatusHistory } from '@/components/workflow';
 import { DocumentValidationPanel } from '@/components/studies/document-validation-panel';
 import type { Document, AnnotationWithReplies, DocumentStatusType } from '@/types';
 
@@ -57,7 +58,7 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
   // Right-hand panel: which tab is open, or null when collapsed
-  const [rightPanel, setRightPanel] = useState<'annotations' | 'validation' | null>(
+  const [rightPanel, setRightPanel] = useState<'annotations' | 'validation' | 'history' | null>(
     'annotations'
   );
   const [totalPages, setTotalPages] = useState<number | null>(null);
@@ -123,7 +124,7 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
   }, []);
 
   // Toggle a right-hand panel tab; clicking the active tab collapses the panel
-  const togglePanel = useCallback((panel: 'annotations' | 'validation') => {
+  const togglePanel = useCallback((panel: 'annotations' | 'validation' | 'history') => {
     userChosePanelRef.current = true;
     setRightPanel((prev) => (prev === panel ? null : panel));
   }, []);
@@ -237,6 +238,15 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
               </span>
             )}
           </Button>
+          <Button
+            variant={rightPanel === 'history' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => togglePanel('history')}
+            title={rightPanel === 'history' ? 'Hide history' : 'Show history'}
+          >
+            <History className="h-4 w-4 mr-2" />
+            History
+          </Button>
 
           {/* Delete button */}
           {onDeleteClick && document && (
@@ -286,6 +296,9 @@ export function DocumentViewer({ documentId, className, onDeleteClick }: Documen
             )}
             {rightPanel === 'validation' && (
               <DocumentValidationPanel documentId={documentId} />
+            )}
+            {rightPanel === 'history' && (
+              <StatusHistory documentId={documentId} />
             )}
           </div>
         </aside>

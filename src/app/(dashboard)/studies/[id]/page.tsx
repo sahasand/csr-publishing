@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { DocumentViewer } from '@/components/studies/document-viewer';
 import { DocumentUpload } from '@/components/studies/document-upload';
+import { ContextSidebar } from '@/components/studies/context-sidebar';
 import { ExportButton } from '@/components/packaging/export-button';
 import { formatBytes, cn } from '@/lib/utils';
 import {
@@ -658,6 +659,29 @@ export default function StudyWorkspacePage() {
               >
                 <PanelRightOpen className="h-4 w-4" />
               </button>
+            </div>
+          ) : selectedNode ? (
+            /* Section selected — show the document/node context sidebar */
+            <div className="h-full flex flex-col">
+              <div className="flex items-center justify-end px-2 pt-2">
+                <button
+                  onClick={() => setRightCollapsed(true)}
+                  className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  title="Collapse info panel"
+                >
+                  <PanelRightClose className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-hidden px-4 pb-4">
+                <ContextSidebar
+                  studyId={id}
+                  node={selectedNode}
+                  document={nodeDocuments[0] ?? null}
+                  onDeleteClick={() => {
+                    if (nodeDocuments[0]) handleDeleteClick(nodeDocuments[0]);
+                  }}
+                />
+              </div>
             </div>
           ) : (
             <div className="p-4 overflow-y-auto h-full">
