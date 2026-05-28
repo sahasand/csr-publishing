@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FileText, FolderTree, Settings, LayoutDashboard } from 'lucide-react';
+import { FileText, FolderTree, Settings, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/studies', label: 'Studies', icon: FileText },
   { href: '/templates', label: 'Templates', icon: FolderTree },
+  { href: '/validation-rules', label: 'Validation Rules', icon: ShieldCheck },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

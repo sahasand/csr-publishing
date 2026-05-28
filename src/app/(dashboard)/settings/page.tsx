@@ -207,12 +207,20 @@ export default function SettingsPage() {
 
         {/* Validation Rules */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileCheck className="h-5 w-5" />
-              Validation Rules
-            </CardTitle>
-            <CardDescription>PDF compliance and formatting checks</CardDescription>
+          <CardHeader className="flex flex-row items-start justify-between gap-4">
+            <div className="space-y-1.5">
+              <CardTitle className="flex items-center gap-2">
+                <FileCheck className="h-5 w-5" />
+                Validation Rules
+              </CardTitle>
+              <CardDescription>PDF compliance and formatting checks</CardDescription>
+            </div>
+            <Link href="/validation-rules">
+              <Button variant="outline" size="sm">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Manage Rules
+              </Button>
+            </Link>
           </CardHeader>
           <CardContent>
             {rulesLoading ? (
